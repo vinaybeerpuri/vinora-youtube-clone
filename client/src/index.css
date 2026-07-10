@@ -293,3 +293,147 @@ button:disabled {
     flex-direction: column;
   }
 }
+
+.warning {
+  color: #ffb4b4;
+}
+
+
+/* =========================
+   YOUTUBE GESTURE UI
+========================= */
+
+
+.gesture-overlay {
+
+  position: absolute;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  z-index: 30;
+
+}
+
+
+.gesture-overlay.left {
+
+  left: 20%;
+
+}
+
+
+.gesture-overlay.right {
+
+  right: 20%;
+
+}
+
+
+.gesture-overlay.center {
+
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+}
+
+
+
+.gesture-circle {
+
+  width: 90px;
+
+  height: 90px;
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.65);
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  animation: gestureZoom .25s ease;
+
+}
+
+
+
+.gesture-icon {
+
+  font-size: 35px;
+
+}
+
+
+
+.gesture-time {
+
+  font-size: 22px;
+
+  font-weight: bold;
+
+}
+
+
+
+@keyframes gestureZoom {
+
+
+  0% {
+
+    transform: scale(.5);
+
+    opacity: 0;
+
+  }
+
+
+  100% {
+
+    transform: scale(1);
+
+    opacity: 1;
+
+  }
+
+}
+
+
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 900px) {
+
+
+  .watch-page {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  .navbar,
+  .section-heading,
+  .profile-hero {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+  }
+
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 56px;       /* clear the fixed MobileTopBar */
+    padding-bottom: 75px !important;  /* clear the fixed BottomNavbar */
+  }
+}

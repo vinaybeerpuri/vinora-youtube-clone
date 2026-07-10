@@ -1,9 +1,11 @@
-const API = "http://localhost:5000/api/videos";
+import API from "../config/api";
+
+const VIDEO_API = `${API}/api/videos`;
 
 export const getVideos = async () => {
 
     const response =
-        await fetch(API);
+        await fetch(VIDEO_API);
 
     return response.json();
 };

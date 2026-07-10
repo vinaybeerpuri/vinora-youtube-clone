@@ -1,0 +1,24 @@
+/* ============================================================
+   Sidebar.css — Hide sidebar on mobile screens (≤ 768px)
+   Desktop layout is UNCHANGED.
+   ============================================================ */
+
+.vinora-sidebar {
+  width: 220px;
+  background-color: #181818;
+  color: white;
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+/* ── MOBILE: hide the sidebar entirely ─────────────────────── */
+@media (max-width: 768px) {
+  .vinora-sidebar {
+    display: none;
+  }
+}

@@ -1,9 +1,11 @@
-const API = "http://localhost:5000/api/auth";
+import API from "../config/api";
+
+const AUTH_API = `${API}/api/auth`;
 
 export const loginUser = async (data) => {
 
     const response = await fetch(
-        `${API}/login`,
+        `${AUTH_API}/login`,
         {
             method: "POST",
 
@@ -21,7 +23,7 @@ export const loginUser = async (data) => {
 export const registerUser = async (data) => {
 
     const response = await fetch(
-        `${API}/register`,
+        `${AUTH_API}/register`,
         {
             method: "POST",
 

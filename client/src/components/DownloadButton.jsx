@@ -32,7 +32,7 @@ const DownloadButton = () => {
                 const response =
                     await fetch(
 
-                        "http://localhost:5000/api/download",
+                        `${API}/api/download`,
 
                         {
                             method: "POST",

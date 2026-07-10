@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
+import API from "../config/api";
 
 
 const History = () => {
@@ -38,7 +39,7 @@ const History = () => {
 
                 const response =
                     await fetch(
-                        "http://localhost:5000/api/history",
+                        `${API}/api/history`,
                         {
 
                             headers: {

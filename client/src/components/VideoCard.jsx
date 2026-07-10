@@ -1,269 +1,95 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import "./VideoCard.css";
 
 const VideoCard = ({ video }) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
+
+  // Helper for dynamic timeago formatted string
+  const timeAgo = (dateString) => {
+    if (!dateString) return "2 days ago";
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    if (seconds < 60) return "just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 4.3) return `${weeks}w ago`;
+    const months = Math.floor(days / 30.4);
+    if (months < 12) return `${months}mo ago`;
+    const years = Math.floor(days / 365);
+    return `${years}y ago`;
+  };
+
+  const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+    video.channel || "V"
+  )}&backgroundColor=e50914&fontSize=42`;
+
+  const thumbnailUrl =
+    video.thumbnail && video.thumbnail.startsWith("http")
+      ? video.thumbnail
+      : "https://via.placeholder.com/400x225?text=No+Thumbnail";
 
   return (
-
-    <Link
-
-      to={`/video/${video._id}`}
-
-      style={{
-        textDecoration: "none",
-        color: "white"
-      }}
-
-    >
-
-
-      <div
-
-        style={{
-
-          cursor: "pointer",
-
-          transition: "0.3s",
-
-        }}
-
-
-        onMouseEnter={(e) => {
-
-          e.currentTarget.style.transform =
-            "translateY(-5px)";
-
-        }}
-
-
-        onMouseLeave={(e) => {
-
-          e.currentTarget.style.transform =
-            "translateY(0)";
-
-        }}
-
-      >
-
-
-
+    <Link to={`/video/${video._id}`} className="video-card-link">
+      <div className="video-card">
         {/* THUMBNAIL */}
-
-        <div
-
-          style={{
-
-            position: "relative"
-
-          }}
-
-        >
-
+        <div className={`video-thumbnail-wrap ${!imgLoaded ? "skeleton-pulse" : ""}`}>
           <img
-
-            src={
-              video.thumbnail &&
-                video.thumbnail.startsWith("http")
-                ? video.thumbnail
-                : "https://via.placeholder.com/400x220?text=No+Thumbnail"
-            }
-
+            src={thumbnailUrl}
             alt={video.title}
-
+            loading="lazy"
+            onLoad={() => setImgLoaded(true)}
             onError={(e) => {
-
-              e.target.src =
-                "https://via.placeholder.com/400x220?text=No+Thumbnail";
-
+              e.target.src = "https://via.placeholder.com/400x225?text=No+Thumbnail";
+              setImgLoaded(true);
             }}
+            className={`video-thumbnail ${imgLoaded ? "loaded" : "loading"}`}
+          />
+          {imgLoaded && <span className="video-duration">10:20</span>}
+        </div>
 
-            style={{
-
-              width: "100%",
-
-              height: "200px",
-
-              objectFit: "cover",
-
-              borderRadius: "12px"
-
-            }}
-
+        {/* INFO SECTION */}
+        <div className="video-info">
+          {/* Channel avatar */}
+          <img
+            className="video-channel-avatar"
+            src={avatarUrl}
+            alt={video.channel}
+            loading="lazy"
           />
 
-
-          {/* Duration placeholder */}
-
-          <span
-
-            style={{
-
-              position: "absolute",
-
-              bottom: "10px",
-
-              right: "10px",
-
-              background: "black",
-
-              padding: "3px 6px",
-
-              borderRadius: "4px",
-
-              fontSize: "12px"
-
-            }}
-
-          >
-
-            10:20
-
-          </span>
-
-
-        </div>
-
-
-
-
-
-        {/* VIDEO INFO */}
-
-        <div
-
-          style={{
-
-            display: "flex",
-
-            gap: "12px",
-
-            marginTop: "12px"
-
-          }}
-
-        >
-
-
-
-          {/* CHANNEL IMAGE */}
-
-          <div
-
-            style={{
-
-              width: "40px",
-
-              height: "40px",
-
-              borderRadius: "50%",
-
-              background: "#333",
-
-              display: "flex",
-
-              justifyContent: "center",
-
-              alignItems: "center",
-
-              flexShrink: 0
-
-            }}
-
-          >
-
-            👤
-
+          {/* Text contents */}
+          <div className="video-text">
+            <h3 className="video-title">{video.title}</h3>
+            <p className="video-channel">{video.channel}</p>
+            <p className="video-stats">
+              {video.views} views • {timeAgo(video.createdAt)}
+            </p>
           </div>
 
-
-
-
-
-          <div>
-
-
-            <h3
-
-              style={{
-
-                fontSize: "16px",
-
-                margin: "0",
-
-                fontWeight: "600",
-
-                lineHeight: "22px",
-
-                display: "-webkit-box",
-
-                WebkitLineClamp: 2,
-
-                WebkitBoxOrient: "vertical",
-
-                overflow: "hidden"
-
-              }}
-
-            >
-
-              {video.title}
-
-            </h3>
-
-
-
-            <p
-
-              style={{
-
-                color: "#aaa",
-
-                margin: "6px 0 0"
-
-              }}
-
-            >
-
-              {video.channel}
-
-            </p>
-
-
-
-
-            <p
-
-              style={{
-
-                color: "#aaa",
-
-                margin: "4px 0"
-
-              }}
-
-            >
-
-              {video.views} views • 2 days ago
-
-            </p>
-
-
-
-          </div>
-
-
+          {/* Options three-dot button (entire card stays clickable) */}
+          <button
+            className="video-options-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            aria-label="Options"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+            </svg>
+          </button>
         </div>
-
-
       </div>
-
-
     </Link>
-
   );
-
 };
-
 
 export default VideoCard;

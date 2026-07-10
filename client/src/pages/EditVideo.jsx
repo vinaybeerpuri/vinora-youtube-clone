@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
+import API from "../config/api";
 
 
 
@@ -53,7 +54,7 @@ const EditVideo = () => {
 
                 const response =
                     await fetch(
-                        `http://localhost:5000/api/videos/${id}`
+                        `${API}/api/videos/${id}`
                     );
 
 
@@ -147,7 +148,7 @@ const EditVideo = () => {
             const response =
                 await fetch(
 
-                    `http://localhost:5000/api/videos/${id}`,
+                    `${API}/api/videos/${id}`,
 
                     {
 

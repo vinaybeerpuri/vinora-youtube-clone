@@ -1,0 +1,74 @@
+/* ============================================================
+   BottomNavbar.css — Mobile bottom navigation stylesheet
+   Hidden on desktop. Displayed on mobile screens ≤ 768px.
+   ============================================================ */
+
+.vinora-bottom-nav {
+  display: none; /* hidden on desktop */
+}
+
+@media (max-width: 768px) {
+  .vinora-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background-color: #0f0f0f;
+    border-top: 1px solid #272727;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* support iPhone notch/home indicator */
+    box-sizing: border-box;
+  }
+
+  .vinora-bottom-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #aaaaaa;
+    text-decoration: none;
+    font-size: 10px;
+    flex: 1;
+    height: 100%;
+    gap: 4px;
+    transition: color 0.2s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+
+  .vinora-bottom-nav__item:active {
+    transform: scale(0.92);
+  }
+
+  .vinora-bottom-nav__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: inherit;
+    transition: transform 0.2s ease;
+  }
+
+  .vinora-bottom-nav__item--active {
+    color: #e50914; /* active link color (premium red) */
+  }
+
+  .vinora-bottom-nav__item--active .vinora-bottom-nav__icon {
+    transform: scale(1.05);
+  }
+
+  .vinora-bottom-nav__label {
+    font-weight: 500;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    text-align: center;
+  }
+}

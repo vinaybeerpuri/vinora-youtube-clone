@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import API from "../config/api";
 
 
 const Search = () => {
@@ -18,7 +19,7 @@ const Search = () => {
 
 
         fetch(
-            `http://localhost:5000/api/videos/search?q=${query}`
+            `${API}/api/videos/search?q=${query}`
         )
 
             .then(res => res.json())

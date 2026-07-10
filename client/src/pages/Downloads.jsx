@@ -4,6 +4,7 @@ import React, {
 } from "react";
 
 import Navbar from "../components/Navbar";
+import API from "../config/api";
 
 
 const Downloads = () => {
@@ -47,7 +48,7 @@ const Downloads = () => {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/download",
+          `${API}/api/download`,
           {
 
             method: "GET",

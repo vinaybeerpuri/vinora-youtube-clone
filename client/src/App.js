@@ -1,4 +1,9 @@
+import { PlayerProvider } from "./context/PlayerContext";
+import MiniPlayer from "./components/MiniPlayer";
 import { Routes, Route } from "react-router-dom";
+import BottomNavbar from "./components/BottomNavbar";
+import MobileTopBar from "./components/MobileTopBar";
+import PlayerContainer from "./components/PlayerContainer";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -16,108 +21,98 @@ import EditVideo from "./pages/EditVideo";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route
-        path="/profile"
-        element={
-          <PrivateRoute>
-            <Profile />
-          </PrivateRoute>
-        }
-      />
+    <PlayerProvider>
 
+      <MobileTopBar />
 
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/premium"
-        element={
-          <PrivateRoute>
-            <Premium />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/search"
-        element={<Search />}
-      />
-      <Route
-        path="/history"
-        element={
-          <PrivateRoute>
-            <History />
-          </PrivateRoute>
-        }
-      />
-      <Route
+      <Routes>
 
-        path="/dashboard"
+        <Route path="/" element={<Home />} />
 
-        element={
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
 
-          <PrivateRoute>
+        <Route path="/login" element={<Login />} />
 
-            <Dashboard />
+        <Route
+          path="/premium"
+          element={
+            <PrivateRoute>
+              <Premium />
+            </PrivateRoute>
+          }
+        />
 
-          </PrivateRoute>
+        <Route
+          path="/search"
+          element={<Search />}
+        />
 
-        }
+        <Route
+          path="/history"
+          element={
+            <PrivateRoute>
+              <History />
+            </PrivateRoute>
+          }
+        />
 
-      />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
 
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
-      <Route path="/register" element={<Register />} />
+        <Route
+          path="/video/:id"
+          element={<VideoPlayer />}
+        />
 
-      <Route
-        path="/video/:id"
-        element={<VideoPlayer />}
-      />
-      <Route
-        path="/upload"
-        element={<UploadVideo />}
-      />
-      <Route
-        path="/upload"
-        element={<UploadVideo />}
-      />
+        <Route
+          path="/upload"
+          element={<UploadVideo />}
+        />
 
+        <Route
+          path="/edit-video/:id"
+          element={
+            <PrivateRoute>
+              <EditVideo />
+            </PrivateRoute>
+          }
+        />
 
-      <Route
-        path="/edit-video/:id"
-        element={
-          <PrivateRoute>
-            <EditVideo />
-          </PrivateRoute>
-        }
-      />
-      <Route
+        <Route
+          path="/downloads"
+          element={
+            <PrivateRoute>
+              <Downloads />
+            </PrivateRoute>
+          }
+        />
 
-        path="/edit-video/:id"
+      </Routes>
 
-        element={
+      <BottomNavbar />
+      <PlayerContainer />
 
-          <PrivateRoute>
+      <MiniPlayer />
 
-            <EditVideo />
-
-          </PrivateRoute>
-
-        }
-
-      />
-
-
-      <Route
-        path="/downloads"
-        element={
-          <PrivateRoute>
-            <Downloads />
-          </PrivateRoute>
-        }
-      />
-
-
-    </Routes>
+    </PlayerProvider>
   );
 }
 

@@ -7,6 +7,7 @@ import {
   useNavigate
 } from "react-router-dom";
 
+import "./Navbar.css";
 
 const Navbar = () => {
 
@@ -87,33 +88,7 @@ const Navbar = () => {
 
   return (
 
-    <div
-
-      style={{
-
-        height: "65px",
-
-        background: "#202020",
-
-        color: "white",
-
-        display: "flex",
-
-        alignItems: "center",
-
-        justifyContent: "space-between",
-
-        padding: "0 25px",
-
-        position: "sticky",
-
-        top: 0,
-
-        zIndex: 1000
-
-      }}
-
-    >
+    <div className="vinora-navbar">
 
 
 
@@ -125,14 +100,7 @@ const Navbar = () => {
       <Link
 
         to="/"
-
-        style={{
-
-          textDecoration: "none",
-
-          color: "red"
-
-        }}
+        className="vinora-navbar__logo"
 
       >
 
@@ -166,23 +134,7 @@ const Navbar = () => {
         }
 
         onKeyDown={handleSearch}
-
-
-        style={{
-
-          width: "450px",
-
-          padding: "12px 20px",
-
-          borderRadius: "25px",
-
-          border: "none",
-
-          outline: "none",
-
-          fontSize: "15px"
-
-        }}
+        className="vinora-navbar__search"
 
 
       />
@@ -196,19 +148,7 @@ const Navbar = () => {
       {/* RIGHT MENU */}
 
 
-      <div
-
-        style={{
-
-          display: "flex",
-
-          alignItems: "center",
-
-          gap: "18px"
-
-        }}
-
-      >
+      <div className="vinora-navbar__right">
 
 
 
@@ -225,13 +165,7 @@ const Navbar = () => {
                 {/* CREATE BUTTON */}
 
 
-                <div
-
-                  style={{
-                    position: "relative"
-                  }}
-
-                >
+                <div className="vinora-navbar__create-wrap">
 
 
                   <button
@@ -239,21 +173,7 @@ const Navbar = () => {
                     onClick={() =>
                       setCreateOpen(!createOpen)
                     }
-
-
-                    style={{
-
-                      padding: "10px 18px",
-
-                      borderRadius: "20px",
-
-                      border: "none",
-
-                      cursor: "pointer",
-
-                      fontWeight: "bold"
-
-                    }}
+                    className="vinora-navbar__create-btn"
 
                   >
 
@@ -270,32 +190,7 @@ const Navbar = () => {
 
                     (
 
-                      <div
-
-                        style={{
-
-                          position: "absolute",
-
-                          top: "45px",
-
-                          right: 0,
-
-                          background: "white",
-
-                          color: "black",
-
-                          width: "180px",
-
-                          borderRadius: "10px",
-
-                          padding: "10px",
-
-                          boxShadow:
-                            "0 5px 15px rgba(0,0,0,.4)"
-
-                        }}
-
-                      >
+                      <div className="vinora-navbar__create-menu">
 
 
                         <p
@@ -303,10 +198,6 @@ const Navbar = () => {
                           onClick={() =>
                             navigate("/upload")
                           }
-
-                          style={{
-                            cursor: "pointer"
-                          }}
 
                         >
 
@@ -321,10 +212,6 @@ const Navbar = () => {
                           onClick={() =>
                             navigate("/live")
                           }
-
-                          style={{
-                            cursor: "pointer"
-                          }}
 
                         >
 
@@ -352,17 +239,7 @@ const Navbar = () => {
                 {/* NOTIFICATION */}
 
 
-                <div
-
-                  style={{
-
-                    fontSize: "22px",
-
-                    cursor: "pointer"
-
-                  }}
-
-                >
+                <div className="vinora-navbar__notif">
 
                   🔔
 
@@ -380,15 +257,7 @@ const Navbar = () => {
 
 
 
-                <div
-
-                  style={{
-
-                    position: "relative"
-
-                  }}
-
-                >
+                <div className="vinora-navbar__profile-wrap">
 
 
 
@@ -407,19 +276,7 @@ const Navbar = () => {
 
 
                     alt="profile"
-
-
-                    style={{
-
-                      width: "42px",
-
-                      height: "42px",
-
-                      borderRadius: "50%",
-
-                      cursor: "pointer"
-
-                    }}
+                    className="vinora-navbar__avatar"
 
 
                   />
@@ -436,52 +293,13 @@ const Navbar = () => {
 
                     (
 
-                      <div
-
-
-                        style={{
-
-                          position: "absolute",
-
-                          right: 0,
-
-                          top: "55px",
-
-                          width: "300px",
-
-                          background: "white",
-
-                          color: "black",
-
-                          borderRadius: "15px",
-
-                          padding: "20px",
-
-                          boxShadow:
-                            "0 5px 20px rgba(0,0,0,.5)"
-
-                        }}
-
-
-                      >
+                      <div className="vinora-navbar__profile-menu">
 
 
 
 
 
-                        <div
-
-                          style={{
-
-                            display: "flex",
-
-                            gap: "15px",
-
-                            alignItems: "center"
-
-                          }}
-
-                        >
+                        <div className="vinora-navbar__profile-header">
 
 
                           <img
@@ -492,16 +310,6 @@ const Navbar = () => {
                             }
 
                             alt="profile"
-
-                            style={{
-
-                              width: "60px",
-
-                              height: "60px",
-
-                              borderRadius: "50%"
-
-                            }}
 
                           />
 
@@ -543,9 +351,6 @@ const Navbar = () => {
                           onClick={() =>
                             navigate("/dashboard")
                           }
-                          style={{
-                            cursor: "pointer"
-                          }}
                         >
                           👤 View your channel
                         </p>
@@ -575,10 +380,6 @@ const Navbar = () => {
                         <p
 
                           onClick={logout}
-
-                          style={{
-                            cursor: "pointer"
-                          }}
 
                         >
 
@@ -639,20 +440,14 @@ const Navbar = () => {
 
                 <Link to="/login">
 
-                  <button>
+                  <button className="vinora-navbar__auth-btn">
                     Login
                   </button>
 
                 </Link>
                 <Link to="/upload">
 
-                  <button
-                    style={{
-                      padding: "8px 15px",
-                      cursor: "pointer",
-                      fontWeight: "bold"
-                    }}
-                  >
+                  <button className="vinora-navbar__auth-btn">
 
                     ➕ Create
 
@@ -665,7 +460,7 @@ const Navbar = () => {
 
                 <Link to="/register">
 
-                  <button>
+                  <button className="vinora-navbar__auth-btn">
                     Register
                   </button>
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./Sidebar.css";
 
 
 const Sidebar = () => {
@@ -32,29 +33,7 @@ const Sidebar = () => {
     return (
 
 
-        <div
-
-            style={{
-
-                width: "220px",
-
-                backgroundColor: "#181818",
-
-                color: "white",
-
-                minHeight: "calc(100vh - 60px)",
-
-                padding: "20px",
-
-                position: "fixed",
-
-                top: "60px",
-
-                left: 0
-
-            }}
-
-        >
+        <div className="vinora-sidebar">
 
 
 

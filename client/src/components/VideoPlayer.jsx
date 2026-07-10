@@ -1,3 +1,5 @@
+﻿import { usePlayer } from "../context/PlayerContext";
+
 import React, {
   useEffect,
   useState,
@@ -10,238 +12,96 @@ import {
 } from "react-router-dom";
 
 import Comments from "./Comments";
-
+import "./VideoPlayer.css";
 
 const VideoPlayer = () => {
 
-
   const { id } = useParams();
-
+  const {
+    currentVideo,
+    setCurrentVideo,
+    player,
+    minimizePlayer,
+    maximizePlayer
+  } = usePlayer();
 
   const [video, setVideo] = useState(null);
-
   const [recommended, setRecommended] = useState([]);
-
   const [likes, setLikes] = useState(0);
-
-  const [player, setPlayer] = useState(null);
-
   const [gestureMessage, setGestureMessage] = useState("");
 
-
+  // Additional Redesign states
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+  const [disliked, setDisliked] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const tapCount = useRef(0);
-
   const tapTimer = useRef(null);
-  const touchPosition =
-    useRef("");
-
+  const touchPosition = useRef("");
 
   // =========================
   // LOAD VIDEO
   // =========================
 
   useEffect(() => {
-
-
     const loadData = async () => {
-
-
       try {
-
-
-        const videoRes =
-          await fetch(
-            `http://192.168.245.41:5000/api/videos/${id}`
-          );
-
-
-        const videoData =
-          await videoRes.json();
-
-
+        const videoRes = await fetch(`http://192.168.245.41:5000/api/videos/${id}`);
+        const videoData = await videoRes.json();
         setVideo(videoData);
+        setCurrentVideo(videoData);
+        maximizePlayer();
+        setLikes(videoData.likes || 0);
 
-
-        setLikes(
-          videoData.likes || 0
-        );
-
-
-
-        const allRes =
-          await fetch(
-            "http://192.168.245.41:5000/api/videos"
-          );
-
-
-        const allData =
-          await allRes.json();
-
-
-
-        setRecommended(
-          Array.isArray(allData)
-            ? allData
-            : []
-        );
-
-
+        const allRes = await fetch("http://192.168.245.41:5000/api/videos");
+        const allData = await allRes.json();
+        setRecommended(Array.isArray(allData) ? allData : []);
 
         // ADD HISTORY
-
-        const token =
-          localStorage.getItem("token");
-
-
+        const token = localStorage.getItem("token");
         if (token) {
-
-          await fetch(
-            "http://192.168.245.41:5000/api/history",
-            {
-
-              method: "POST",
-
-              headers: {
-
-                "Content-Type":
-                  "application/json",
-
-                Authorization:
-                  `Bearer ${token}`
-
-              },
-
-
-              body: JSON.stringify({
-
-                videoId: id
-
-              })
-
-            });
-
+          await fetch("http://192.168.245.41:5000/api/history", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ videoId: id })
+          });
         }
-
-
-
-      }
-      catch (error) {
-
+      } catch (error) {
         console.log(error);
-
       }
-
-
     };
-
-
-
     loadData();
-
-
+    // Reset additional UI states on video change
+    setDescExpanded(false);
+    setSubscribed(false);
+    setDisliked(false);
+    setSaved(false);
   }, [id]);
-
-
-
-
-
 
   // =========================
   // HISTORY
   // =========================
 
-
   const addHistory = async () => {
-
-
-    const token =
-      localStorage.getItem("token");
-
-
-    if (!token)
-      return;
-
-
-
-    await fetch(
-      "http://192.168.245.41:5000/api/history",
-      {
-
-        method: "POST",
-
-        headers: {
-
-          "Content-Type":
-            "application/json",
-
-          Authorization:
-            `Bearer ${token}`
-
-        },
-
-
-        body: JSON.stringify({
-
-          videoId: id
-
-        })
-
-      }
-    );
-
-
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    await fetch("http://192.168.245.41:5000/api/history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ videoId: id })
+    });
   };
-
-
-
-
-
-
 
   // =========================
   // YOUTUBE ID
   // =========================
-
-
-  const getYoutubeId = (url) => {
-
-
-    if (!url)
-      return "";
-
-
-    if (url.includes("v=")) {
-
-      return url
-        .split("v=")[1]
-        .split("&")[0];
-
-    }
-
-
-    if (url.includes("youtu.be")) {
-
-      return url
-        .split("youtu.be/")[1]
-        .split("?")[0];
-
-    }
-
-
-    return "";
-
-  };
-
-
-
-  const youtubeId =
-    getYoutubeId(
-      video?.videoUrl
-    );
-
-
-
 
 
 
@@ -250,1182 +110,389 @@ const VideoPlayer = () => {
   // YOUTUBE PLAYER
   // =========================
 
-
-  useEffect(() => {
-
-
-    if (!youtubeId)
-      return;
-
-
-
-    const createPlayer = () => {
-
-
-      const yt =
-        new window.YT.Player(
-          "youtube-player",
-          {
-
-            height: "500",
-
-            width: "100%",
-
-
-            videoId: youtubeId,
-
-
-            playerVars: {
-
-              autoplay: 0
-
-            },
-
-
-            events: {
-
-              onReady: (event) => {
-
-                setPlayer(
-                  event.target
-                );
-
-              }
-
-            }
-
-          }
-        );
-
-
-
-      return yt;
-
-
-    };
-
-
-
-
-
-    if (window.YT) {
-
-
-      createPlayer();
-
-
-    }
-    else {
-
-
-      const script =
-        document.createElement("script");
-
-
-      script.src =
-        "https://www.youtube.com/iframe_api";
-
-
-      document.body.appendChild(script);
-
-
-
-      window.onYouTubeIframeAPIReady =
-        createPlayer;
-
-
-    }
-
-
-
-    return () => {
-
-      setPlayer(null);
-
-    };
-
-
-
-  }, [youtubeId]);
-
-
-
-
-
-
   // =========================
   // WATCH LIMIT
   // =========================
 
-
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !player) return;
 
-
-    const token =
-      localStorage.getItem("token");
-
-
-
-    if (!token || !player)
-      return;
-
-
-
-
-    const interval =
-      setInterval(async () => {
-
-
-        try {
-
-
-          const res =
-            await fetch(
-              "http://192.168.245.41:5000/api/watch",
-              {
-
-                method: "PUT",
-
-                headers: {
-
-                  Authorization:
-                    `Bearer ${token}`
-
-                }
-
-              });
-
-
-
-          const data =
-            await res.json();
-
-
-
-          if (res.status === 403) {
-
-
-            alert(data.message);
-
-
-            player.pauseVideo();
-
-
-            window.location.href =
-              "/premium";
-
-
-          }
-
-
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("http://192.168.245.41:5000/api/watch", {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.status === 403) {
+          alert(data.message);
+          player.pauseVideo();
+          window.location.href = "/premium";
         }
-        catch (error) {
-
-          console.log(error);
-
-        }
-
-
-
-      }, 60000);
-
-
-
+      } catch (error) {
+        console.log(error);
+      }
+    }, 60000);
 
     return () => clearInterval(interval);
-
-
-
   }, [player]);
-
-
-
-
-
-
-
 
   // =========================
   // LIKE VIDEO
   // =========================
 
-
   const likeVideo = async () => {
-
-
     try {
-
-
-      const res =
-        await fetch(
-          `http://192.168.245.41:5000/api/videos/${id}/like`,
-          {
-
-            method: "PUT"
-
-          });
-
-
-
-      const data =
-        await res.json();
-
-
-
-      setLikes(
-        data.likes || 0
-      );
-
-
-    }
-    catch (error) {
-
+      const res = await fetch(`http://192.168.245.41:5000/api/videos/${id}/like`, { method: "PUT" });
+      const data = await res.json();
+      setLikes(data.likes || 0);
+      setDisliked(false); // Reset dislike if liked
+    } catch (error) {
       console.log(error);
-
     }
-
-
   };
-
-
-
-
-
-
 
   // =========================
   // DOWNLOAD VIDEO
   // =========================
 
-
   const downloadVideo = async () => {
-
-
-    const token =
-      localStorage.getItem("token");
-
-
-    if (!token) {
-
-      alert("Login required");
-
-      return;
-
-    }
-
-
-
+    const token = localStorage.getItem("token");
+    if (!token) { alert("Login required"); return; }
     try {
-
-
-      const res =
-        await fetch(
-          "http://192.168.245.41:5000/api/download",
-          {
-
-            method: "POST",
-
-            headers: {
-
-              "Content-Type":
-                "application/json",
-
-              Authorization:
-                `Bearer ${token}`
-
-            },
-
-
-            body: JSON.stringify({
-
-              videoId: id
-
-            })
-
-          });
-
-
-
-      const data =
-        await res.json();
-
-
-
-      alert(
-        data.message
-      );
-
-
-    }
-    catch (error) {
-
+      const res = await fetch("http://192.168.245.41:5000/api/download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ videoId: id })
+      });
+      const data = await res.json();
+      alert(data.message);
+    } catch (error) {
       console.log(error);
-
     }
-
-
   };
-
-
-
-
-
 
   // =========================
   // SHARE
   // =========================
 
-
   const shareVideo = () => {
-
-
-    navigator.clipboard.writeText(
-      window.location.href
-    );
-
-
-    alert(
-      "Link copied"
-    );
-
-
+    navigator.clipboard.writeText(window.location.href);
+    alert("Link copied");
   };
-
-
-
-
-
-
-
 
   // =========================
   // GESTURES
   // =========================
 
-
   const showGestureMessage = (msg) => {
-
-
     setGestureMessage(msg);
-
-
     setTimeout(() => {
-
       setGestureMessage("");
-
     }, 1500);
-
-
   };
-
-
-
-
-
 
   const handleGesture = (e) => {
+    if (!player) return;
 
 
-    if (!player)
-      return;
-
-
-
-    const rect =
-      e.currentTarget.getBoundingClientRect();
-
-
-
-    const x =
-      e.clientX - rect.left;
-
-
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
 
     let position;
-
-
-
-    if (x < rect.width / 3) {
-
-      position = "left";
-
-    }
-    else if (x > (rect.width * 2) / 3) {
-
-      position = "right";
-
-    }
-    else {
-
-      position = "center";
-
-    }
-
-
+    if (x < rect.width / 3) { position = "left"; }
+    else if (x > (rect.width * 2) / 3) { position = "right"; }
+    else { position = "center"; }
 
     tapCount.current++;
+    clearTimeout(tapTimer.current);
 
+    tapTimer.current = setTimeout(() => {
+      const taps = tapCount.current;
+      tapCount.current = 0;
 
+      // SINGLE TAP
+      if (taps === 1 && position === "center") {
+        const state = player.getPlayerState();
 
-    clearTimeout(
-      tapTimer.current
-    );
-
-
-
-    tapTimer.current =
-      setTimeout(() => {
-
-
-        const taps =
-          tapCount.current;
-
-
-        tapCount.current = 0;
-
-
-
-        // SINGLE TAP
-
-        if (taps === 1 && position === "center") {
-
-
-          const state =
-            player.getPlayerState();
-
-
-
-          if (state === 1) {
-
-
-            player.pauseVideo();
-
-            showGestureMessage(
-              "⏸ Paused"
-            );
-
-
-          }
-          else {
-
-
-            player.playVideo();
-
-            showGestureMessage(
-              "▶ Playing"
-            );
-
-
-          }
-
-
+        if (state === window.YT.PlayerState.PLAYING) {
+          player.pauseVideo();
+        } else {
+          player.playVideo();
         }
+      }
 
-
-
-
-
-
-        // DOUBLE TAP
-
-        if (taps === 2) {
-
-
-          const current =
-            player.getCurrentTime();
-
-
-
-          if (position === "right") {
-
-
-            player.seekTo(
-              current + 10,
-              true
-            );
-
-
-            showGestureMessage(
-              "⏩ +10 sec"
-            );
-
-
-          }
-
-
-
-          if (position === "left") {
-
-
-            player.seekTo(
-              current - 10,
-              true
-            );
-
-
-            showGestureMessage(
-              "⏪ -10 sec"
-            );
-
-
-          }
-
-
+      // DOUBLE TAP
+      if (taps === 2) {
+        const current = player.getCurrentTime();
+        if (position === "right") {
+          player.seekTo(current + 10, true);
+          showGestureMessage("⏩ +10 sec");
         }
-
-
-
-
-
-
-
-        // TRIPLE TAP
-
-        if (taps === 3) {
-
-
-
-          if (position === "left") {
-
-
-            document
-              .getElementById(
-                "comments"
-              )
-              ?.scrollIntoView({
-                behavior: "smooth"
-              });
-
-
-
-            showGestureMessage(
-              "💬 Comments"
-            );
-
-
-          }
-
-
-
-
-
-          if (position === "right") {
-
-
-            window.location.href = "/";
-
-
-          }
-
-
+        if (position === "left") {
+          player.seekTo(current - 10, true);
+          showGestureMessage("⏪ -10 sec");
         }
+      }
 
-
-
-      }, 300);
-
-
+      // TRIPLE TAP
+      if (taps === 3) {
+        if (position === "left") {
+          document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+          showGestureMessage("💬 Comments");
+        }
+        if (position === "right") {
+          window.location.href = "/";
+        }
+      }
+    }, 300);
   };
+
   // =========================
   // MOBILE TOUCH GESTURE
   // =========================
 
   const handleTouchStart = (e) => {
+    if (!player) return;
 
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
 
-    if (!player)
-      return;
-
-
-
-    const touch =
-      e.touches[0];
-
-
-    const rect =
-      e.currentTarget.getBoundingClientRect();
-
-
-
-    const x =
-      touch.clientX - rect.left;
-
-
-
-    if (x < rect.width / 3) {
-
-      touchPosition.current =
-        "left";
-
-    }
-
-    else if (x > (rect.width * 2) / 3) {
-
-      touchPosition.current =
-        "right";
-
-    }
-
-    else {
-
-      touchPosition.current =
-        "center";
-
-    }
-
-
+    if (x < rect.width / 3) { touchPosition.current = "left"; }
+    else if (x > (rect.width * 2) / 3) { touchPosition.current = "right"; }
+    else { touchPosition.current = "center"; }
 
     tapCount.current++;
+    clearTimeout(tapTimer.current);
 
+    tapTimer.current = setTimeout(() => {
+      const taps = tapCount.current;
+      tapCount.current = 0;
+      const position = touchPosition.current;
 
+      // SINGLE TAP
+      if (taps === 1 && position === "center") {
+        const state = player.getPlayerState();
 
-    clearTimeout(
-      tapTimer.current
-    );
-
-
-
-    tapTimer.current =
-      setTimeout(() => {
-
-
-        const taps =
-          tapCount.current;
-
-
-        tapCount.current = 0;
-
-
-
-        const position =
-          touchPosition.current;
-
-
-
-
-        // SINGLE TAP
-
-        if (taps === 1 && position === "center") {
-
-
-          const state =
-            player.getPlayerState();
-
-
-
-          if (state === 1) {
-
-            player.pauseVideo();
-
-            showGestureMessage(
-              "⏸ Paused"
-            );
-
-          }
-          else {
-
-            player.playVideo();
-
-            showGestureMessage(
-              "▶ Playing"
-            );
-
-          }
-
-
+        if (state === window.YT.PlayerState.PLAYING) {
+          player.pauseVideo();
+        } else {
+          player.playVideo();
         }
+      }
 
-
-
-
-        // DOUBLE TAP
-
-        if (taps === 2) {
-
-
-          const current =
-            player.getCurrentTime();
-
-
-
-          if (position === "right") {
-
-
-            player.seekTo(
-              current + 10,
-              true
-            );
-
-
-            showGestureMessage(
-              "⏩ +10 seconds"
-            );
-
-
-          }
-
-
-
-          if (position === "left") {
-
-
-            player.seekTo(
-              current - 10,
-              true
-            );
-
-
-            showGestureMessage(
-              "⏪ -10 seconds"
-            );
-
-
-          }
-
-
+      // DOUBLE TAP
+      if (taps === 2) {
+        const current = player.getCurrentTime();
+        if (position === "right") {
+          player.seekTo(current + 10, true);
+          showGestureMessage("⏩ +10 sec");
         }
-
-
-
-
-
-        // TRIPLE TAP
-
-        if (taps === 3) {
-
-
-
-          if (position === "left") {
-
-
-            document
-              .getElementById("comments")
-              ?.scrollIntoView({
-                behavior: "smooth"
-              });
-
-
-
-            showGestureMessage(
-              "💬 Comments"
-            );
-
-
-          }
-
-
-
-
-          if (position === "right") {
-
-
-            window.location.href = "/";
-
-
-          }
-
-
+        if (position === "left") {
+          player.seekTo(current - 10, true);
+          showGestureMessage("⏪ -10 sec");
         }
+      }
 
-
-
-      }, 300);
-
-
-
+      // TRIPLE TAP
+      if (taps === 3) {
+        if (position === "left") {
+          document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+          showGestureMessage("💬 Comments");
+        }
+        if (position === "right") {
+          window.location.href = "/";
+        }
+      }
+    }, 300);
   };
 
+  // =========================
+  // RENDER HELPERS
+  // =========================
+  useEffect(() => {
 
+    return () => {
 
+      minimizePlayer();
 
+    };
 
-
-
+  }, [minimizePlayer]);
   if (!video) {
-
-
-    return (
-
-      <div
-        style={{
-          background: "#111",
-          color: "white",
-          height: "100vh",
-          padding: "30px"
-        }}
-      >
-
-        Loading...
-
-      </div>
-
-    );
-
-
+    return <div className="vp-loading">Loading...</div>;
   }
 
+  const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+    video.channel || "V"
+  )}&backgroundColor=e50914`;
 
-
-
-
-
+  // Dynamic formatted date string
+  const formattedDate = new Date(video.createdAt || Date.now()).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
 
 
   return (
+    <div className="vp-page">
+      <div className="vp-layout">
 
+        {/* MAIN VIDEO COLUMN */}
+        <div className="vp-main">
 
-    <div
-
-      style={{
-
-        background: "#0f0f0f",
-
-        color: "white",
-
-        minHeight: "100vh",
-
-        padding: "20px"
-
-      }}
-
-    >
-
-
-
-      <div
-
-        style={{
-
-          display: "flex",
-
-          gap: "25px"
-
-        }}
-
-      >
-
-
-
-
-        {/* MAIN CONTENT */}
-
-
-        <div
-
-          style={{
-
-            flex: 3
-
-          }}
-
-        >
-
-
-
-
-          <div
-
-            style={{
-
-              position: "relative"
-
-            }}
-
-          >
-
-
+          {/* PLAYER COMPONENT */}
+          <div className="vp-player-wrap">
             <div
-
-              id="youtube-player"
-
-              onClick={handleGesture}
-
-              onTouchStart={handleTouchStart}
-
-              style={{
-
-                touchAction: "manipulation"
-
-              }}
-
+              className="vp-player-container"
+              onDoubleClick={(e) => e.preventDefault()}
             >
-            </div>
-
-
-
-            {
-              gestureMessage &&
 
               <div
+                className="vp-touch-layer"
+                onClick={handleGesture}
+                onTouchStart={handleTouchStart}
+              />
 
-                style={{
-
-                  position: "absolute",
-
-                  top: "50%",
-
-                  left: "50%",
-
-                  transform:
-                    "translate(-50%,-50%)",
-
-                  background:
-                    "rgba(0,0,0,.7)",
-
-                  padding: "15px 25px",
-
-                  borderRadius: "10px",
-
-                  fontSize: "20px"
-
-                }}
-
-              >
-
+            </div>
+            {gestureMessage && (
+              <div className="vp-gesture-overlay">
                 {gestureMessage}
-
               </div>
-
-            }
-
-
+            )}
           </div>
 
-
-
-
-
-
-
-          <h2>
-
-            {video.title}
-
-          </h2>
-
-
-
-
-          <button onClick={likeVideo}>
-
-            👍 {likes}
-
-          </button>
-
-
-
-
-          <button
-
-            onClick={downloadVideo}
-
-            style={{
-
-              marginLeft: "10px"
-
-            }}
-
-          >
-
-            ⬇ Download
-
-          </button>
-
-
-
-
-
-          <button
-
-            onClick={shareVideo}
-
-            style={{
-
-              marginLeft: "10px"
-
-            }}
-
-          >
-
-            Share
-
-          </button>
-
-
-
-
-
-
-
-          <div
-
-            style={{
-
-              marginTop: "20px",
-
-              background: "#222",
-
-              padding: "20px",
-
-              borderRadius: "12px"
-
-            }}
-
-          >
-
-
-            <h3>
-
-              {video.channel}
-
-            </h3>
-
-
-            <p>
-
-              {video.views} views
-
+          {/* VIDEO METADATA */}
+          <div className="vp-metadata">
+            <h2 className="vp-title">{video.title}</h2>
+            <p className="vp-stats-row">
+              {video.views} views â€¢ {formattedDate}
             </p>
-
-
-            <p>
-
-              Welcome to VINORA.
-              Enjoy watching this video.
-
-            </p>
-
-
           </div>
 
+          {/* ACTION BUTTON PILLS */}
+          <div className="vp-actions">
+            {/* Split Pill: Like & Dislike */}
+            <div className="vp-split-pill-group">
+              <button className="vp-split-pill-left" onClick={likeVideo}>
+                <svg viewBox="0 0 24 24">
+                  <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                </svg>
+                <span>{likes}</span>
+              </button>
+              <button
+                className="vp-split-pill-right"
+                onClick={() => setDisliked(!disliked)}
+                style={{ color: disliked ? "#e50914" : "" }}
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M23 3h-4v12h4V3zM1 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2H6c-.83 0-1.54.5-1.84 1.22L1.14 11.27c-.09.23-.14.47-.14.73v2z" />
+                </svg>
+              </button>
+            </div>
 
+            {/* Share Pill */}
+            <button className="vp-pill" onClick={shareVideo}>
+              <svg viewBox="0 0 24 24">
+                <path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z" />
+              </svg>
+              <span>Share</span>
+            </button>
 
+            {/* Download Pill */}
+            <button className="vp-pill" onClick={downloadVideo}>
+              <svg viewBox="0 0 24 24">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z" />
+              </svg>
+              <span>Download</span>
+            </button>
 
+            {/* Save Pill */}
+            <button
+              className="vp-pill"
+              onClick={() => setSaved(!saved)}
+              style={{ color: saved ? "#3ea6ff" : "" }}
+            >
+              <svg viewBox="0 0 24 24">
+                <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+              </svg>
+              <span>{saved ? "Saved" : "Save"}</span>
+            </button>
+          </div>
 
+          {/* CHANNEL SECTION */}
+          <div className="vp-channel-bar">
+            <div className="vp-channel-left">
+              <img className="vp-channel-avatar" src={avatarUrl} alt={video.channel} />
+              <div className="vp-channel-meta">
+                <h3 className="vp-channel-name">{video.channel}</h3>
+                <span className="vp-channel-subs">
+                  {video.subscribers || "1.25M"} subscribers
+                </span>
+              </div>
+            </div>
+            <button
+              className={`vp-subscribe-btn ${subscribed ? "subscribed" : ""}`}
+              onClick={() => setSubscribed(!subscribed)}
+            >
+              {subscribed ? "Subscribed" : "Subscribe"}
+            </button>
+          </div>
 
+          {/* DESCRIPTION CARD */}
+          <div className="vp-description-card" onClick={() => setDescExpanded(!descExpanded)}>
+            <div className="vp-desc-header">
+              <span>{video.views} views</span>
+              <span>{formattedDate}</span>
+            </div>
+            <p className="vp-desc-text">
+              {descExpanded
+                ? `Welcome to VINORA. Enjoy watching this video. All gesture controls, playlists, history logs and video details are fully initialized for the channel creator.`
+                : `Welcome to VINORA. Enjoy watching this video...`}
+            </p>
+            <button className="vp-desc-more-btn">
+              {descExpanded ? "Show less" : "...more"}
+            </button>
+          </div>
 
+          {/* COMMENTS SECTION */}
           <div id="comments">
-
-
-            <Comments
-
-              videoId={id}
-
-            />
-
-
+            <Comments videoId={id} />
           </div>
 
-
-
-
-
         </div>
 
-
-
-
-
-
-
-
-
-        {/* RECOMMENDED */}
-
-
-        <div
-
-          style={{
-
-            flex: 1
-
-          }}
-
-        >
-
-
-          <h3>
-
-            Recommended
-
-          </h3>
-
-
-
-          {
-            recommended
-
-              .filter(
-                v => v._id !== video._id
-              )
-
-              .map(v => (
-
-
-                <Link
-
-                  key={v._id}
-
-                  to={`/video/${v._id}`}
-
-                  style={{
-
-                    color: "white",
-
-                    textDecoration: "none"
-
-                  }}
-
-                >
-
-
-                  <img
-
-                    src={v.thumbnail}
-
-                    alt={v.title}
-
-                    style={{
-
-                      width: "100%",
-
-                      borderRadius: "10px"
-
-                    }}
-
-                  />
-
-
-                  <h4>
-
-                    {v.title}
-
-                  </h4>
-
-
-                </Link>
-
-
-              ))
-
+        {/* RECOMMENDED COLUMN */}
+        <div className="vp-recommended">
+          <h3>Recommended</h3>
+          {recommended
+            .filter((v) => v._id !== video._id)
+            .map((v) => (
+              <Link key={v._id} to={`/video/${v._id}`} className="vp-rec-card">
+                <div className="vp-rec-thumb-wrap">
+                  <img src={v.thumbnail} alt={v.title} className="vp-rec-thumb" />
+                </div>
+                <div className="vp-rec-info">
+                  <h4 className="vp-rec-title">{v.title}</h4>
+                  <p className="vp-rec-meta">
+                    {v.channel}<br />
+                    {v.views} views
+                  </p>
+                </div>
+              </Link>
+            ))
           }
-
-
-
         </div>
-
-
 
       </div>
-
-
     </div>
-
-
   );
-
-
 };
-
 
 export default VideoPlayer;

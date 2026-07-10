@@ -1,0 +1,69 @@
+/* ============================================================
+   Home.css — Layout for the Home page
+   Desktop layout is UNCHANGED. Mobile breakpoint: 768px.
+   ============================================================ */
+
+/* ── Page shell ────────────────────────────────────────────── */
+.home-page {
+  background: #0f0f0f;
+  min-height: 100vh;
+  color: white;
+  overflow-x: hidden; /* prevent horizontal scroll */
+}
+
+/* ── Sidebar + main wrapper ────────────────────────────────── */
+.home-body {
+  display: flex;
+}
+
+/* ── Main content area ─────────────────────────────────────── */
+.home-main {
+  flex: 1;
+  padding: 25px;
+  margin-left: 260px; /* matches fixed sidebar width (220px) + its padding */
+  min-width: 0;       /* prevent flex child overflow */
+  box-sizing: border-box;
+}
+
+/* ── Section heading ───────────────────────────────────────── */
+.home-heading {
+  font-size: 28px;
+  margin-bottom: 25px;
+  margin-top: 0;
+}
+
+/* ── Video grid ────────────────────────────────────────────── */
+.home-video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+.home-empty {
+  color: #aaa;
+  font-size: 18px;
+}
+
+/* ============================================================
+   MOBILE  ≤ 768px
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Main takes full width — sidebar is hidden via Sidebar.css */
+  .home-main {
+    margin-left: 0;
+    padding: 14px 12px;
+  }
+
+  /* Scale down section heading */
+  .home-heading {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* Single-column grid */
+  .home-video-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

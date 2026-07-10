@@ -1,0 +1,145 @@
+.mini-player {
+
+    position: fixed;
+
+    bottom: 75px;
+
+    right: 20px;
+
+    width: 340px;
+
+    height: 90px;
+
+    background: #181818;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 10px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .45);
+
+    z-index: 9999;
+
+    cursor: pointer;
+
+    animation: slideUp .3s ease;
+
+}
+
+.mini-thumbnail {
+
+    width: 120px;
+
+    height: 70px;
+
+    border-radius: 8px;
+
+    object-fit: cover;
+
+}
+
+.mini-info {
+
+    flex: 1;
+
+    overflow: hidden;
+
+}
+
+.mini-info h4 {
+
+    margin: 0;
+
+    color: white;
+
+    font-size: 15px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+}
+
+.mini-info p {
+
+    margin-top: 6px;
+
+    color: #b3b3b3;
+
+    font-size: 13px;
+
+}
+
+.mini-btn {
+
+    background: none;
+
+    border: none;
+
+    color: white;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    padding: 8px;
+
+}
+
+.mini-btn:hover {
+
+    color: #ff0000;
+
+}
+
+@keyframes slideUp {
+
+    from {
+
+        transform: translateY(120px);
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        transform: translateY(0);
+
+        opacity: 1;
+
+    }
+
+}
+
+@media(max-width:768px) {
+
+    .mini-player {
+
+        width: 100%;
+
+        left: 0;
+
+        right: 0;
+
+        bottom: 60px;
+
+        border-radius: 0;
+
+    }
+
+    .mini-thumbnail {
+
+        width: 130px;
+
+    }
+
+}

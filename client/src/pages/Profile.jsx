@@ -5,6 +5,7 @@ import React, {
 
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
+import API from "../config/api";
 
 
 const Profile = () => {
@@ -48,7 +49,7 @@ const Profile = () => {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/profile",
+          `${API}/api/profile`,
           {
 
             headers: {

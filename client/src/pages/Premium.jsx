@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "../components/Navbar";
+import API from "../config/api";
 
 
 const Premium = () => {
@@ -31,7 +32,7 @@ const Premium = () => {
 
             const orderResponse =
                 await fetch(
-                    "http://localhost:5000/api/payment/create-order",
+                    `${API}/api/payment/create-order`,
                     {
 
                         method: "POST",
@@ -152,7 +153,7 @@ const Premium = () => {
                         const verifyResponse =
                             await fetch(
 
-                                "http://localhost:5000/api/payment/verify-payment",
+                                `${API}/api/payment/verify-payment`,
 
                                 {
 

@@ -1,0 +1,201 @@
+/* ============================================================
+   Navbar.css — Desktop + Mobile responsive styles
+   Desktop layout is UNCHANGED. Mobile breakpoint: 768px.
+   ============================================================ */
+
+/* ---------- Root container ---------- */
+.vinora-navbar {
+  height: 65px;
+  background: #202020;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  gap: 12px;
+}
+
+/* ---------- Logo ---------- */
+.vinora-navbar__logo {
+  text-decoration: none;
+  color: red;
+  flex-shrink: 0;
+}
+
+.vinora-navbar__logo h2 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ---------- Search ---------- */
+.vinora-navbar__search {
+  width: 450px;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/* ---------- Right menu ---------- */
+.vinora-navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+/* ---------- Create button wrapper ---------- */
+.vinora-navbar__create-wrap {
+  position: relative;
+}
+
+.vinora-navbar__create-btn {
+  padding: 10px 18px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ---------- Create dropdown ---------- */
+.vinora-navbar__create-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  color: black;
+  width: 180px;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  z-index: 1100;
+}
+
+.vinora-navbar__create-menu p {
+  cursor: pointer;
+  margin: 6px 0;
+}
+
+/* ---------- Notification icon ---------- */
+.vinora-navbar__notif {
+  font-size: 22px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ---------- Profile wrapper ---------- */
+.vinora-navbar__profile-wrap {
+  position: relative;
+}
+
+.vinora-navbar__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: block;
+}
+
+/* ---------- Profile dropdown ---------- */
+.vinora-navbar__profile-menu {
+  position: absolute;
+  right: 0;
+  top: 55px;
+  width: 300px;
+  background: white;
+  color: black;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  z-index: 1100;
+}
+
+.vinora-navbar__profile-header {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.vinora-navbar__profile-header img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.vinora-navbar__profile-menu p {
+  cursor: pointer;
+  margin: 6px 0;
+}
+
+/* ---------- Auth buttons (logged-out) ---------- */
+.vinora-navbar__auth-btn {
+  padding: 8px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   MOBILE  ≤ 768px
+   Strategy: wrap to two rows
+     Row 1 → logo | right-controls
+     Row 2 → full-width search bar
+   ============================================================ */
+@media (max-width: 768px) {
+  /* ── Hide desktop navbar — MobileTopBar takes over ───────── */
+  .vinora-navbar {
+    display: none;
+  }
+
+  /* Logo stays left, takes natural width */
+  .vinora-navbar__logo {
+    flex: 0 0 auto;
+  }
+
+  /* Right controls stay right on the first row */
+  .vinora-navbar__right {
+    flex: 0 0 auto;
+    margin-left: auto;
+    gap: 12px;
+  }
+
+  /* Search drops to its own full-width second row */
+  .vinora-navbar__search {
+    width: 100%;
+    order: 3; /* push below logo + right row */
+    flex: 0 0 100%;
+    padding: 9px 16px;
+    font-size: 14px;
+  }
+
+  /* Shrink Create button text on very small screens */
+  .vinora-navbar__create-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Keep the auth buttons from overflowing */
+  .vinora-navbar__auth-btn {
+    padding: 7px 10px;
+    font-size: 13px;
+  }
+
+  /* Profile dropdown: keep it inside viewport */
+  .vinora-navbar__profile-menu {
+    width: min(300px, calc(100vw - 28px));
+    right: 0;
+  }
+
+  /* Create dropdown: keep inside viewport */
+  .vinora-navbar__create-menu {
+    width: min(180px, calc(100vw - 28px));
+    right: 0;
+  }
+}

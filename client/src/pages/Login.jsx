@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import API from "../config/api";
 
 const Login = () => {
 
@@ -14,7 +15,7 @@ const Login = () => {
         try {
 
             const response = await fetch(
-                "http://192.168.245.41:5000/api/auth/login",
+                `${API}/api/auth/login`,
                 {
                     method: "POST",
 

@@ -1,0 +1,227 @@
+/* ============================================================
+   Comments.css — YouTube Mobile Inspired Comments Stylesheet
+   ============================================================ */
+
+.cm-section {
+  margin-top: 24px;
+  color: #fff;
+  border-top: 1px solid #272727;
+  padding-top: 20px;
+}
+
+.cm-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 14px 0;
+  color: #fff;
+}
+
+/* Input Row Layout */
+.cm-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.cm-textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background-color: #1f1f1f;
+  color: #fff;
+  border: 1px solid #2f2f2f;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 70px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.cm-textarea:focus {
+  border-color: #555;
+}
+
+.cm-submit-btn {
+  align-self: flex-end;
+  padding: 8px 16px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  background-color: #e50914;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.cm-submit-btn:hover {
+  opacity: 0.9;
+}
+
+/* Comments List Container */
+.cm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Individual Comment Card - Redesigned as beautiful rounded cards */
+.cm-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #1f1f1f; /* Dark theme card background */
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #2d2d2d;
+  box-sizing: border-box;
+  transition: background-color 0.2s;
+}
+
+.cm-card:hover {
+  background-color: #272727;
+}
+
+.cm-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* User Circular Avatar */
+.cm-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #444;
+}
+
+.cm-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cm-username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f1f1;
+}
+
+.cm-city {
+  font-size: 11px;
+  color: #aaa;
+}
+
+/* Body Area Offset by Avatar Width + Gap */
+.cm-body {
+  padding-left: 44px;
+  margin-top: 6px;
+}
+
+.cm-text {
+  font-size: 13.5px;
+  color: #f1f1f1;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cm-translation {
+  margin: 8px 0 0 0;
+  font-size: 13px;
+  color: #3ea6ff;
+  background: rgba(62, 166, 255, 0.08);
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* Language selector */
+.cm-lang-wrap {
+  margin-top: 10px;
+}
+
+.cm-lang-wrap select {
+  background-color: #151515;
+  color: #aaa;
+  font-size: 11px;
+  border: 1px solid #2f2f2f;
+  border-radius: 12px;
+  padding: 4px 10px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Action button row */
+.cm-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.cm-action-btn {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 14px;
+  transition: background-color 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cm-action-btn:hover {
+  background-color: #151515;
+  color: #fff;
+}
+
+.cm-translate-btn {
+  margin-left: auto;
+  font-weight: 500;
+}
+
+/* ============================================================
+   MOBILE  ≤ 768px Spacings
+   ============================================================ */
+@media (max-width: 768px) {
+  .cm-section {
+    padding-top: 16px;
+  }
+  
+  .cm-section h2 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  
+  .cm-textarea {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .cm-submit-btn {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+
+  .cm-card {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .cm-body {
+    padding-left: 40px;
+  }
+
+  .cm-text {
+    font-size: 12.5px;
+  }
+}

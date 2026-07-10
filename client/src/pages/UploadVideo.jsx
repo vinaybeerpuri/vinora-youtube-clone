@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../config/api";
 
 
 const UploadVideo = () => {
@@ -45,7 +46,7 @@ const UploadVideo = () => {
 
             const response =
                 await fetch(
-                    "http://localhost:5000/api/videos",
+                    `${API}/api/videos`,
                     {
 
                         method: "POST",

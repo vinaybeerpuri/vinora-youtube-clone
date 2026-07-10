@@ -2,6 +2,7 @@ import React, {
     useEffect,
     useState
 } from "react";
+import API from "../config/api";
 
 import Navbar from "../components/Navbar";
 import {
@@ -55,7 +56,7 @@ const Dashboard = () => {
         // PROFILE
 
         fetch(
-            "http://192.168.245.41:5000/api/profile",
+            `${API}/api/profile`,
             {
                 headers: {
                     Authorization:
@@ -87,7 +88,7 @@ const Dashboard = () => {
         // HISTORY
 
         fetch(
-            "http://192.168.245.41:5000/api/history",
+            `${API}/api/history`,
             {
                 headers: {
                     Authorization:
@@ -122,7 +123,7 @@ const Dashboard = () => {
 
 
         fetch(
-            "http://192.168.245.41:5000/api/videos/myvideos",
+            `${API}/api/videos/myvideos`,
             {
 
                 headers: {
@@ -190,7 +191,7 @@ const Dashboard = () => {
             const response =
                 await fetch(
 
-                    `http://192.168.245.41:5000/api/videos/${id}`,
+                    `${API}/api/videos/${id}`,
 
                     {
 

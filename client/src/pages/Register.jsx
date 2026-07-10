@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import API from "../config/api";
 
 const Register = () => {
     const [name, setName] =
@@ -22,7 +23,7 @@ const Register = () => {
 
         try {
             const response = await fetch(
-                "http://192.168.245.41:5000/api/auth/register",
+                `${API}/api/auth/register`,
                 {
                     method: "POST",
                     headers: {
