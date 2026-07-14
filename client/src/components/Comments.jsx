@@ -174,7 +174,7 @@ const Comments = ({ videoId }) => {
                 />
                 <div className="cm-user-info">
                   <strong className="cm-username">{comment.username}</strong>
-                  <span className="cm-city">ðŸ“ {comment.city}</span>
+                  <span className="cm-city">📍{comment.city}</span>
                 </div>
               </div>
 
@@ -202,10 +202,10 @@ const Comments = ({ videoId }) => {
 
                 <div className="cm-btn-row">
                   <button className="cm-action-btn" onClick={() => handleLike(comment._id)}>
-                    ðŸ‘ {comment.likes || 0}
+                    👍{comment.likes || 0}
                   </button>
                   <button className="cm-action-btn" onClick={() => handleDislike(comment._id)}>
-                    ðŸ‘Ž {comment.dislikes || 0}
+                    👎{comment.dislikes || 0}
                   </button>
                   <button
                     className="cm-action-btn cm-translate-btn"
@@ -217,7 +217,7 @@ const Comments = ({ videoId }) => {
                       )
                     }
                   >
-                    ðŸŒ Translate
+                    🌐 Translate
                   </button>
                 </div>
               </div>

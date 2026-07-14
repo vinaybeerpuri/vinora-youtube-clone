@@ -1,4 +1,4 @@
-
+require("./dns-fix");
 const express = require("express");
 const userRoutes =
     require("./routes/userRoutes");

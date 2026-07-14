@@ -1,3 +1,4 @@
+import API from "../config/api";
 import React, { useEffect, useState } from "react";
 
 import Navbar from "../components/Navbar";
@@ -11,7 +12,7 @@ const Home = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const API = process.env.REACT_APP_API_URL;
+        console.log("API =", API);
 
         const response = await fetch(`${API}/api/videos`);
 

@@ -1,4 +1,6 @@
-﻿import { usePlayer } from "../context/PlayerContext";
+﻿import PlayerContainer from "./PlayerContainer";
+import API from "../config/api";
+import { usePlayer } from "../context/PlayerContext";
 
 import React, {
   useEffect,
@@ -17,6 +19,7 @@ import "./VideoPlayer.css";
 const VideoPlayer = () => {
 
   const { id } = useParams();
+  console.log("Video ID:", id);
   const {
     currentVideo,
     setCurrentVideo,
@@ -47,21 +50,21 @@ const VideoPlayer = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const videoRes = await fetch(`http://192.168.245.41:5000/api/videos/${id}`);
+        const videoRes = await fetch(`${API}/api/videos/${id}`);
         const videoData = await videoRes.json();
         setVideo(videoData);
         setCurrentVideo(videoData);
         maximizePlayer();
         setLikes(videoData.likes || 0);
 
-        const allRes = await fetch("http://192.168.245.41:5000/api/videos");
+        const allRes = await fetch("http://localhost:5000/api/videos");
         const allData = await allRes.json();
         setRecommended(Array.isArray(allData) ? allData : []);
 
         // ADD HISTORY
         const token = localStorage.getItem("token");
         if (token) {
-          await fetch("http://192.168.245.41:5000/api/history", {
+          await fetch("http://localhost:5000/api/history", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -89,7 +92,7 @@ const VideoPlayer = () => {
   const addHistory = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    await fetch("http://192.168.245.41:5000/api/history", {
+    await fetch("http://localhost:5000/api/history", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -120,7 +123,7 @@ const VideoPlayer = () => {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("http://192.168.245.41:5000/api/watch", {
+        const res = await fetch("http://localhost:5000/api/watch", {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -144,7 +147,7 @@ const VideoPlayer = () => {
 
   const likeVideo = async () => {
     try {
-      const res = await fetch(`http://192.168.245.41:5000/api/videos/${id}/like`, { method: "PUT" });
+      const res = await fetch(`http://localhost:5000/api/videos/${id}/like`, { method: "PUT" });
       const data = await res.json();
       setLikes(data.likes || 0);
       setDisliked(false); // Reset dislike if liked
@@ -161,7 +164,7 @@ const VideoPlayer = () => {
     const token = localStorage.getItem("token");
     if (!token) { alert("Login required"); return; }
     try {
-      const res = await fetch("http://192.168.245.41:5000/api/download", {
+      const res = await fetch("http://localhost:5000/api/download", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -317,13 +320,13 @@ const VideoPlayer = () => {
   // =========================
   useEffect(() => {
 
+    maximizePlayer();
+
     return () => {
-
       minimizePlayer();
-
     };
 
-  }, [minimizePlayer]);
+  }, []);
   if (!video) {
     return <div className="vp-loading">Loading...</div>;
   }
@@ -349,10 +352,13 @@ const VideoPlayer = () => {
 
           {/* PLAYER COMPONENT */}
           <div className="vp-player-wrap">
+
             <div
               className="vp-player-container"
               onDoubleClick={(e) => e.preventDefault()}
             >
+
+              <PlayerContainer />
 
               <div
                 className="vp-touch-layer"
@@ -361,11 +367,13 @@ const VideoPlayer = () => {
               />
 
             </div>
+
             {gestureMessage && (
               <div className="vp-gesture-overlay">
                 {gestureMessage}
               </div>
             )}
+
           </div>
 
           {/* VIDEO METADATA */}

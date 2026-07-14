@@ -108,7 +108,7 @@ function App() {
       </Routes>
 
       <BottomNavbar />
-      <PlayerContainer />
+
 
       <MiniPlayer />
 

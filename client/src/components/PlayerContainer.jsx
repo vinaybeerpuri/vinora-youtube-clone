@@ -33,8 +33,12 @@ function PlayerContainer() {
     useEffect(() => {
 
         if (!currentVideo) return;
-
+        console.log("Current Video:", currentVideo);
         const youtubeId = getYoutubeId(currentVideo.videoUrl);
+
+        console.log("Video URL:", currentVideo.videoUrl);
+        console.log("YouTube ID:", youtubeId);
+
 
         // Player already exists
         if (player) {
@@ -141,14 +145,12 @@ function PlayerContainer() {
 
         <div
             style={{
-                position: isMiniPlayer ? "fixed" : "fixed",
-                top: isMiniPlayer ? "auto" : "70px",
+                position: isMiniPlayer ? "fixed" : "relative", top: isMiniPlayer ? "auto" : "0",
 
                 bottom: isMiniPlayer ? "80px" : "auto",
                 right: isMiniPlayer ? "20px" : "0",
 
-                width: isMiniPlayer ? "340px" : "100vw",
-                height: isMiniPlayer ? "190px" : "500px",
+                width: isMiniPlayer ? "340px" : "100%", height: isMiniPlayer ? "190px" : "100%",
                 background: "#000",
 
                 zIndex: 9999,
