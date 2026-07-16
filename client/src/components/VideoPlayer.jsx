@@ -1,4 +1,4 @@
-﻿import PlayerContainer from "./PlayerContainer";
+import PlayerContainer from "./PlayerContainer";
 import API from "../config/api";
 import { usePlayer } from "../context/PlayerContext";
 
@@ -10,7 +10,8 @@ import React, {
 
 import {
   useParams,
-  Link
+  Link,
+  useNavigate
 } from "react-router-dom";
 
 import Comments from "./Comments";
@@ -39,9 +40,13 @@ const VideoPlayer = () => {
   const [disliked, setDisliked] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const navigate = useNavigate();
+
   const tapCount = useRef(0);
   const tapTimer = useRef(null);
   const touchPosition = useRef("");
+  const isTouchDevice = useRef(false);
+  const touchResetTimeout = useRef(null);
 
   // =========================
   // LOAD VIDEO
@@ -199,9 +204,84 @@ const VideoPlayer = () => {
     }, 1500);
   };
 
-  const handleGesture = (e) => {
+  const processGesture = (taps, position) => {
+    // 3. Fix Player Readiness
+    const isPlayerReady = player && typeof player.getCurrentTime === "function" && typeof player.seekTo === "function";
+    if (!isPlayerReady) {
+      console.log("Player not ready - ignoring gesture");
+      return;
+    }
+
+    // SINGLE TAP
+    if (taps === 1 && position === "center") {
+      if (typeof player.getPlayerState === "function" &&
+          typeof player.pauseVideo === "function" &&
+          typeof player.playVideo === "function") {
+        console.log("Gesture detected: Single Center");
+        const state = player.getPlayerState();
+        if (state === window.YT.PlayerState.PLAYING) {
+          player.pauseVideo();
+        } else {
+          player.playVideo();
+        }
+      }
+    }
+
+    // DOUBLE TAP
+    if (taps === 2) {
+      const current = typeof player.getCurrentTime === "function" ? player.getCurrentTime() : 0;
+      const duration = typeof player.getDuration === "function" ? player.getDuration() : 0;
+      console.log("player.getCurrentTime() returned:", current);
+      console.log("player.getDuration() returned:", duration);
+
+      if (position === "right") {
+        console.log("Gesture detected: Double Right");
+        const targetTime = duration > 0 ? Math.min(current + 10, duration) : current + 10;
+        console.log(`Calling player.seekTo() with targetTime: ${targetTime}`);
+        player.seekTo(targetTime, true);
+        showGestureMessage("⏩ +10 sec");
+      }
+      if (position === "left") {
+        console.log("Gesture detected: Double Left");
+        const targetTime = Math.max(current - 10, 0);
+        console.log(`Calling player.seekTo() with targetTime: ${targetTime}`);
+        player.seekTo(targetTime, true);
+        showGestureMessage("⏪ -10 sec");
+      }
+    }
+
+    // TRIPLE TAP
+    if (taps === 3) {
+      if (position === "left") {
+        console.log("Gesture detected: Triple Left");
+        document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+        showGestureMessage("💬 Comments");
+      }
+      if (position === "center") {
+        console.log("Gesture detected: Triple Center");
+        const nextVideos = recommended.filter((v) => video && v._id !== video._id);
+        if (nextVideos.length > 0) {
+          const nextVideo = nextVideos[0];
+          navigate(`/video/${nextVideo._id}`);
+          showGestureMessage("⏭️ Next Video");
+        } else {
+          showGestureMessage("No recommended videos");
+        }
+      }
+      if (position === "right") {
+        console.log("Gesture detected: Triple Right");
+        showGestureMessage("🏠 Go Home & Minimize");
+        navigate("/");
+      }
+    }
+  };
+
+  const handlePointerDown = (e) => {
     if (!player) return;
 
+    if (e.pointerType === "touch" || isTouchDevice.current) {
+      return;
+    }
 
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -217,50 +297,18 @@ const VideoPlayer = () => {
     tapTimer.current = setTimeout(() => {
       const taps = tapCount.current;
       tapCount.current = 0;
-
-      // SINGLE TAP
-      if (taps === 1 && position === "center") {
-        const state = player.getPlayerState();
-
-        if (state === window.YT.PlayerState.PLAYING) {
-          player.pauseVideo();
-        } else {
-          player.playVideo();
-        }
-      }
-
-      // DOUBLE TAP
-      if (taps === 2) {
-        const current = player.getCurrentTime();
-        if (position === "right") {
-          player.seekTo(current + 10, true);
-          showGestureMessage("⏩ +10 sec");
-        }
-        if (position === "left") {
-          player.seekTo(current - 10, true);
-          showGestureMessage("⏪ -10 sec");
-        }
-      }
-
-      // TRIPLE TAP
-      if (taps === 3) {
-        if (position === "left") {
-          document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
-          showGestureMessage("💬 Comments");
-        }
-        if (position === "right") {
-          window.location.href = "/";
-        }
-      }
-    }, 300);
+      processGesture(taps, position);
+    }, 450);
   };
-
-  // =========================
-  // MOBILE TOUCH GESTURE
-  // =========================
 
   const handleTouchStart = (e) => {
     if (!player) return;
+
+    isTouchDevice.current = true;
+    if (touchResetTimeout.current) clearTimeout(touchResetTimeout.current);
+    touchResetTimeout.current = setTimeout(() => {
+      isTouchDevice.current = false;
+    }, 1500);
 
     const touch = e.touches[0];
     const rect = e.currentTarget.getBoundingClientRect();
@@ -277,42 +325,8 @@ const VideoPlayer = () => {
       const taps = tapCount.current;
       tapCount.current = 0;
       const position = touchPosition.current;
-
-      // SINGLE TAP
-      if (taps === 1 && position === "center") {
-        const state = player.getPlayerState();
-
-        if (state === window.YT.PlayerState.PLAYING) {
-          player.pauseVideo();
-        } else {
-          player.playVideo();
-        }
-      }
-
-      // DOUBLE TAP
-      if (taps === 2) {
-        const current = player.getCurrentTime();
-        if (position === "right") {
-          player.seekTo(current + 10, true);
-          showGestureMessage("⏩ +10 sec");
-        }
-        if (position === "left") {
-          player.seekTo(current - 10, true);
-          showGestureMessage("⏪ -10 sec");
-        }
-      }
-
-      // TRIPLE TAP
-      if (taps === 3) {
-        if (position === "left") {
-          document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
-          showGestureMessage("💬 Comments");
-        }
-        if (position === "right") {
-          window.location.href = "/";
-        }
-      }
-    }, 300);
+      processGesture(taps, position);
+    }, 450);
   };
 
   // =========================
@@ -362,7 +376,7 @@ const VideoPlayer = () => {
 
               <div
                 className="vp-touch-layer"
-                onClick={handleGesture}
+                onPointerDown={handlePointerDown}
                 onTouchStart={handleTouchStart}
               />
 

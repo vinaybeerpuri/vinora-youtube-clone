@@ -178,6 +178,21 @@ const Sidebar = () => {
 
 
 
+            <Link
+
+                to="/call"
+
+                style={menuStyle}
+
+            >
+
+                📞 Video Call
+
+            </Link>
+
+
+
+
 
             <hr
 

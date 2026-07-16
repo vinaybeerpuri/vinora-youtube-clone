@@ -1,104 +1,68 @@
 require("./dns-fix");
-const express = require("express");
-const userRoutes =
-    require("./routes/userRoutes");
-const cors = require("cors");
-const watchRoutes =
-    require("./routes/watchRoutes");
-
 require("dotenv").config();
-const profileRoutes =
-    require("./routes/profileRoutes");
+
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
 
 const connectDB = require("./config/db");
 
+// Routes
 const authRoutes = require("./routes/authRoutes");
+const profileRoutes = require("./routes/profileRoutes");
 const downloadRoutes = require("./routes/downloadRoutes");
+const historyRoutes = require("./routes/historyRoutes");
+const watchRoutes = require("./routes/watchRoutes");
 const videoRoutes = require("./routes/videoRoutes");
 const commentRoutes = require("./routes/commentRoutes");
-const paymentRoutes =
-    require(
-        "./routes/paymentRoutes"
-    );
-const historyRoutes =
-    require("./routes/historyRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const userRoutes = require("./routes/userRoutes");
+const recordingRoutes = require("./routes/recordingRoutes");
+
+// Socket signaling handler
+const registerSocketHandlers = require("./socket/index");
 
 const app = express();
+const server = http.createServer(app);
 
-connectDB();
+// ─── Socket.IO ─────────────────────────────────────────────────────────────
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
+registerSocketHandlers(io);
+
+// ─── Middleware ─────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 
+// ─── Connect DB ─────────────────────────────────────────────────────────────
+connectDB();
 
-// AUTH ROUTES
-
-app.use(
-    "/api/auth",
-    authRoutes
-);
-app.use(
-    "/api/profile",
-    profileRoutes
-);
-
-
-// DOWNLOAD ROUTES
-
-app.use(
-    "/api/download",
-    downloadRoutes
-);
-app.use(
-    "/api/history",
-    historyRoutes
-);
-app.use(
-    "/api/watch",
-    watchRoutes
-);
-
-// VIDEO ROUTES
-
-app.use(
-    "/api/videos",
-    videoRoutes
-);
-
-
-// COMMENT ROUTES
-
-app.use(
-    "/api/comments",
-    commentRoutes
-);
-app.use(
-    "/api/payment",
-    paymentRoutes
-);
-app.use(
-    "/api/users",
-    userRoutes
-);
+// ─── REST Routes ─────────────────────────────────────────────────────────────
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/download", downloadRoutes);
+app.use("/api/history", historyRoutes);
+app.use("/api/watch", watchRoutes);
+app.use("/api/videos", videoRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/recordings", recordingRoutes);
 
 app.get("/", (req, res) => {
-    res.send(
-        "Backend Running Successfully"
-    );
+    res.send("Backend Running Successfully");
 });
 
-const PORT =
-    process.env.PORT || 5000;
+// ─── Start Server ─────────────────────────────────────────────────────────────
+const PORT = process.env.PORT || 5000;
 
-
-app.listen(
-    PORT,
-    "0.0.0.0",
-    () => {
-
-        console.log(
-            `Server running on port ${PORT}`
-        );
-
-    }
-);
+server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Socket.IO signaling server active`);
+});

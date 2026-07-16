@@ -355,6 +355,14 @@ const Navbar = () => {
                           👤 View your channel
                         </p>
 
+                        <p
+                          onClick={() =>
+                            navigate("/call")
+                          }
+                        >
+                          📞 Video Call
+                        </p>
+
 
 
 

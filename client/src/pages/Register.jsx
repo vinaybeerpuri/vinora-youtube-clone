@@ -44,12 +44,15 @@ const Register = () => {
                 await response.json();
 
             if (response.ok) {
-                alert(
-                    "Registration Successful"
-                );
-
-                window.location.href =
-                    "/login";
+                if (data.pendingOtp) {
+                    localStorage.setItem("pendingUserId", data.userId);
+                    localStorage.setItem("pendingChannel", data.otpChannel);
+                    alert("Registration successful. OTP sent to your registered " + (data.otpChannel === "email" ? "Email" : "Mobile"));
+                    window.location.href = "/verify-otp";
+                } else {
+                    alert("Registration Successful");
+                    window.location.href = "/login";
+                }
             } else {
                 alert(data.message);
             }

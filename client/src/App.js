@@ -1,10 +1,10 @@
-import { PlayerProvider } from "./context/PlayerContext";
-import MiniPlayer from "./components/MiniPlayer";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { PlayerProvider } from "./context/PlayerContext";
+import { useTheme } from "./context/ThemeContext";
+import MiniPlayer from "./components/MiniPlayer";
 import BottomNavbar from "./components/BottomNavbar";
 import MobileTopBar from "./components/MobileTopBar";
-import PlayerContainer from "./components/PlayerContainer";
-
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Premium from "./pages/Premium";
@@ -18,100 +18,99 @@ import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import UploadVideo from "./pages/UploadVideo";
 import EditVideo from "./pages/EditVideo";
+import OtpVerify from "./pages/OtpVerify";
+import VoipCall from "./components/VoipCall";
 
 function App() {
+  const { theme } = useTheme();
+
   return (
     <PlayerProvider>
+      <div className={`app ${theme === "light" ? "light" : ""}`} style={{ minHeight: "100vh" }}>
+        <MobileTopBar />
 
-      <MobileTopBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
 
-      <Routes>
+          <Route path="/login" element={<Login />} />
 
-        <Route path="/" element={<Home />} />
+          <Route
+            path="/premium"
+            element={
+              <PrivateRoute>
+                <Premium />
+              </PrivateRoute>
+            }
+          />
 
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
+          <Route path="/search" element={<Search />} />
 
-        <Route path="/login" element={<Login />} />
+          <Route
+            path="/history"
+            element={
+              <PrivateRoute>
+                <History />
+              </PrivateRoute>
+            }
+          />
 
-        <Route
-          path="/premium"
-          element={
-            <PrivateRoute>
-              <Premium />
-            </PrivateRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
 
-        <Route
-          path="/search"
-          element={<Search />}
-        />
+          <Route path="/register" element={<Register />} />
 
-        <Route
-          path="/history"
-          element={
-            <PrivateRoute>
-              <History />
-            </PrivateRoute>
-          }
-        />
+          <Route path="/video/:id" element={<VideoPlayer />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
+          <Route path="/upload" element={<UploadVideo />} />
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+          <Route
+            path="/edit-video/:id"
+            element={
+              <PrivateRoute>
+                <EditVideo />
+              </PrivateRoute>
+            }
+          />
 
-        <Route
-          path="/video/:id"
-          element={<VideoPlayer />}
-        />
+          <Route
+            path="/downloads"
+            element={
+              <PrivateRoute>
+                <Downloads />
+              </PrivateRoute>
+            }
+          />
 
-        <Route
-          path="/upload"
-          element={<UploadVideo />}
-        />
+          <Route path="/verify-otp" element={<OtpVerify />} />
 
-        <Route
-          path="/edit-video/:id"
-          element={
-            <PrivateRoute>
-              <EditVideo />
-            </PrivateRoute>
-          }
-        />
+          <Route
+            path="/call"
+            element={
+              <PrivateRoute>
+                <VoipCall />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
 
-        <Route
-          path="/downloads"
-          element={
-            <PrivateRoute>
-              <Downloads />
-            </PrivateRoute>
-          }
-        />
-
-      </Routes>
-
-      <BottomNavbar />
-
-
-      <MiniPlayer />
-
+        <BottomNavbar />
+        <MiniPlayer />
+      </div>
     </PlayerProvider>
   );
 }

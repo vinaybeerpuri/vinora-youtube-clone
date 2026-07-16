@@ -45,8 +45,8 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.vp-player-wrap #youtube-player,
-.vp-player-wrap #youtube-player iframe {
+.vp-player-wrap #global-player,
+.vp-player-wrap #global-player iframe {
   position: absolute;
   inset: 0;
   width: 100% !important;
@@ -68,7 +68,7 @@
   font-size: 16px;
   font-weight: 600;
   pointer-events: none;
-  z-index: 40;
+  z-index: 100000;
   animation: overlay-fade 0.8s ease-in-out forwards;
 }
 
@@ -397,12 +397,8 @@
   overflow: hidden;
 }
 
-#youtube-player {
-  width: 100%;
-  height: 100%;
-}
-
-#youtube-player iframe {
+#global-player,
+#global-player iframe {
   width: 100%;
   height: 100%;
 }
@@ -410,15 +406,21 @@
 .vp-touch-layer {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 99999;
+  pointer-events: auto;
   background: transparent;
-  touch-action: none;
 }
 
 /* ============================================================
    MOBILE  ≤ 768px Spacings
    ============================================================ */
 @media (max-width: 768px) {
+
+  .vp-player-container iframe,
+  .vp-player-container #global-player {
+    pointer-events: none !important;
+  }
+
   .vp-page {
     padding: 0 0 16px 0;
   }

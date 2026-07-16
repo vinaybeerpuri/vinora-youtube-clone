@@ -42,32 +42,17 @@ const Login = () => {
 
 
             if (response.ok) {
-
-
-                localStorage.setItem(
-                    "token",
-                    data.token
-                );
-
-
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify(data)
-                );
-
-
-                console.log(
-                    "TOKEN SAVED:",
-                    localStorage.getItem("token")
-                );
-
-
-                alert("Login Successful");
-
-
-                window.location.href = "/";
-
-
+                if (data.pendingOtp) {
+                    localStorage.setItem("pendingUserId", data.userId);
+                    localStorage.setItem("pendingChannel", data.otpChannel);
+                    alert("OTP sent to your registered " + (data.otpChannel === "email" ? "Email" : "Mobile"));
+                    window.location.href = "/verify-otp";
+                } else {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data));
+                    alert("Login Successful");
+                    window.location.href = "/";
+                }
             }
             else {
 
