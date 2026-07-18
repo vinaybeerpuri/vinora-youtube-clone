@@ -61,14 +61,13 @@ const VideoPlayer = () => {
         maximizePlayer();
         setLikes(videoData.likes || 0);
 
-        const allRes = await fetch("http://localhost:5000/api/videos");
-        const allData = await allRes.json();
+        const allRes = await fetch(`${API}/api/videos`); const allData = await allRes.json();
         setRecommended(Array.isArray(allData) ? allData : []);
 
         // ADD HISTORY
         const token = localStorage.getItem("token");
         if (token) {
-          await fetch("http://localhost:5000/api/history", {
+          await fetch(`${API}/api/history`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -115,9 +114,11 @@ const VideoPlayer = () => {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/watch", {
+        const res = await fetch(`${API}/api/watch`, {
           method: "PUT",
-          headers: { Authorization: `Bearer ${token}` }
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
         const data = await res.json();
         if (res.status === 403) {
@@ -139,7 +140,7 @@ const VideoPlayer = () => {
 
   const likeVideo = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/videos/${id}/like`, { method: "PUT" });
+      const res = await fetch(`${API}/api/videos/${id}/like`, { method: "PUT" });
       const data = await res.json();
       setLikes(data.likes || 0);
       setDisliked(false); // Reset dislike if liked
@@ -156,7 +157,7 @@ const VideoPlayer = () => {
     const token = localStorage.getItem("token");
     if (!token) { alert("Login required"); return; }
     try {
-      const res = await fetch("http://localhost:5000/api/download", {
+      const res = await fetch(`${API}/api/download`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

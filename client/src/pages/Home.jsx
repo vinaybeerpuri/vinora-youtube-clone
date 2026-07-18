@@ -42,10 +42,9 @@ const Home = () => {
           {videos.length === 0 ? (
             <h3 className="home-empty">No videos available</h3>
           ) : (
-            <div className="home-video-grid">
-              {videos.map((video) => (
-                <VideoCard key={video._id} video={video} />
-              ))}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: "20px" }}>              {videos.map((video) => (
+              <VideoCard key={video._id} video={video} />
+            ))}
             </div>
           )}
         </main>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePlayer } from "../context/PlayerContext";
 
 function PlayerContainer() {
@@ -10,21 +10,22 @@ function PlayerContainer() {
         isMiniPlayer,
         setIsPlaying,
     } = usePlayer();
+    const lastVideoId = useRef("");
 
     // -----------------------------
     // Extract YouTube Video ID
     // -----------------------------
     const getYoutubeId = (url) => {
-
         if (!url) return "";
 
-        if (url.includes("v="))
-            return url.split("v=")[1].split("&")[0];
+        const regExp =
+            /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
 
-        if (url.includes("youtu.be/"))
-            return url.split("youtu.be/")[1].split("?")[0];
+        const match = url.match(regExp);
 
-        return "";
+        return match && match[1].length === 11
+            ? match[1]
+            : "";
     };
 
     // -----------------------------
@@ -43,10 +44,18 @@ function PlayerContainer() {
         // Player already exists
         if (player) {
 
-            console.log("Existing player found");
+            // Don't reload if the same video is already loaded
+            if (lastVideoId.current === youtubeId) {
+                return;
+            }
+
+            // Remember which video is loaded
+            lastVideoId.current = youtubeId;
+
             console.log("Loading:", youtubeId);
 
             player.loadVideoById(youtubeId);
+
             player.playVideo();
 
             return;
@@ -75,6 +84,9 @@ function PlayerContainer() {
                     onReady: (event) => {
 
                         console.log("Player Ready");
+
+                        // Save the first loaded video ID
+                        lastVideoId.current = youtubeId;
 
                         setPlayer(event.target);
 
@@ -135,8 +147,7 @@ function PlayerContainer() {
             window.onYouTubeIframeAPIReady = createPlayer;
         }
 
-    }, [currentVideo, player, setPlayer, setIsPlaying]);    // -----------------------------
-    // Hide when no video selected
+    }, [currentVideo]);    // Hide when no video selected
     // -----------------------------
     if (!currentVideo) return null;
 
