@@ -135,8 +135,7 @@ function PlayerContainer() {
             window.onYouTubeIframeAPIReady = createPlayer;
         }
 
-    }, [currentVideo, player]);
-    // -----------------------------
+    }, [currentVideo, player, setPlayer, setIsPlaying]);    // -----------------------------
     // Hide when no video selected
     // -----------------------------
     if (!currentVideo) return null;

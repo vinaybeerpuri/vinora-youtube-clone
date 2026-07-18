@@ -22,7 +22,6 @@ const VideoPlayer = () => {
   const { id } = useParams();
   console.log("Video ID:", id);
   const {
-    currentVideo,
     setCurrentVideo,
     player,
     minimizePlayer,
@@ -88,24 +87,12 @@ const VideoPlayer = () => {
     setSubscribed(false);
     setDisliked(false);
     setSaved(false);
-  }, [id]);
-
+  }, [id, maximizePlayer, setCurrentVideo]);
   // =========================
   // HISTORY
   // =========================
 
-  const addHistory = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    await fetch("http://localhost:5000/api/history", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ videoId: id })
-    });
-  };
+
 
   // =========================
   // YOUTUBE ID
@@ -215,8 +202,8 @@ const VideoPlayer = () => {
     // SINGLE TAP
     if (taps === 1 && position === "center") {
       if (typeof player.getPlayerState === "function" &&
-          typeof player.pauseVideo === "function" &&
-          typeof player.playVideo === "function") {
+        typeof player.pauseVideo === "function" &&
+        typeof player.playVideo === "function") {
         console.log("Gesture detected: Single Center");
         const state = player.getPlayerState();
         if (state === window.YT.PlayerState.PLAYING) {
@@ -340,7 +327,7 @@ const VideoPlayer = () => {
       minimizePlayer();
     };
 
-  }, []);
+  }, [maximizePlayer, minimizePlayer]);
   if (!video) {
     return <div className="vp-loading">Loading...</div>;
   }
