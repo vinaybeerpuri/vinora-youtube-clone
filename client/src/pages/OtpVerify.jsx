@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../config/api";
 import { useTheme } from "../context/ThemeContext";
+import logo from "../assets/vinora-logo.png";
 
 const OtpVerify = () => {
     const [otp, setOtp] = useState("");
@@ -116,9 +117,12 @@ const OtpVerify = () => {
                     borderRadius: "10px"
                 }}
             >
-                <h1 style={{ color: "red", textAlign: "center" }}>
-                    VINORA
-                </h1>
+                <img
+                    src={logo}
+                    alt="VINORA"
+                    className="logo"
+                    style={{ height: "48px", objectFit: "contain", marginBottom: "8px", display: "block", margin: "0 auto 8px" }}
+                />
 
                 <h2 style={{ textAlign: "center", margin: 0 }}>
                     OTP Verification

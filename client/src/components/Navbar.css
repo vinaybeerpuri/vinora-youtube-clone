@@ -25,9 +25,11 @@
   flex-shrink: 0;
 }
 
-.vinora-navbar__logo h2 {
-  margin: 0;
-  white-space: nowrap;
+.vinora-navbar__logo img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
 /* ---------- Search ---------- */

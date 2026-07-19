@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import "./Navbar.css";
+import logo from "../assets/vinora-logo.png";
 
 const Navbar = () => {
 
@@ -104,11 +105,11 @@ const Navbar = () => {
 
       >
 
-        <h2>
-
-          🎬 VINORA
-
-        </h2>
+        <img
+          src={logo}
+          alt="VINORA"
+          className="logo"
+        />
 
 
       </Link>

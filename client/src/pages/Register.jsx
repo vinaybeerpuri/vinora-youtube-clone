@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../config/api";
+import logo from "../assets/vinora-logo.png";
 
 const Register = () => {
     const [name, setName] =
@@ -92,15 +93,12 @@ const Register = () => {
                     gap: "15px",
                 }}
             >
-                <h1
-                    style={{
-                        textAlign: "center",
-                        color: "#ff0000",
-                        marginBottom: "10px"
-                    }}
-                >
-                    VINORA
-                </h1>
+                <img
+                    src={logo}
+                    alt="VINORA"
+                    className="logo"
+                    style={{ height: "48px", objectFit: "contain", marginBottom: "10px" }}
+                />
                 <h2>Register</h2>
 
                 <input

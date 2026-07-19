@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./MobileTopBar.css";
+import logo from "../assets/vinora-logo.png";
 
 const MobileTopBar = () => {
   const navigate = useNavigate();
@@ -26,16 +27,12 @@ const MobileTopBar = () => {
 
       {/* ── LEFT: Logo ─────────────────────────────────────────── */}
       <Link to="/" className="mob-topbar__logo">
-        {/* YouTube-style play-button SVG */}
-        <svg
-          className="mob-topbar__play-icon"
-          viewBox="0 0 90 63"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <rect width="90" height="63" rx="14" fill="#e50914" />
-          <polygon points="36,18 36,45 60,31.5" fill="white" />
-        </svg>
+        {/* VINORA logo */}
+        <img
+          src={logo}
+          alt="VINORA"
+          className="logo mob-topbar__play-icon"
+        />
 
         <span className="mob-topbar__wordmark">
           <span>V</span>INORA

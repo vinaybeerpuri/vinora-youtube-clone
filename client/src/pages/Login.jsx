@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../config/api";
+import logo from "../assets/vinora-logo.png";
 
 const Login = () => {
 
@@ -102,9 +103,12 @@ const Login = () => {
             >
 
 
-                <h1 style={{ color: "red" }}>
-                    VINORA
-                </h1>
+                <img
+                    src={logo}
+                    alt="VINORA"
+                    className="logo"
+                    style={{ height: "48px", objectFit: "contain", marginBottom: "8px" }}
+                />
 
 
                 <h2>
