@@ -31,7 +31,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Home />} />
-          
+
           <Route
             path="/profile"
             element={
@@ -73,6 +73,8 @@ function App() {
           />
 
           <Route path="/register" element={<Register />} />
+
+
 
           <Route path="/video/:id" element={<VideoPlayer />} />
 

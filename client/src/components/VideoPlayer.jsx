@@ -5,7 +5,8 @@ import { usePlayer } from "../context/PlayerContext";
 import React, {
   useEffect,
   useState,
-  useRef
+  useRef,
+  useCallback
 } from "react";
 
 import {
@@ -25,13 +26,23 @@ const VideoPlayer = () => {
     setCurrentVideo,
     player,
     minimizePlayer,
-    maximizePlayer
+    maximizePlayer,
+    closePlayer
   } = usePlayer();
 
   const [video, setVideo] = useState(null);
   const [recommended, setRecommended] = useState([]);
   const [likes, setLikes] = useState(0);
   const [gestureMessage, setGestureMessage] = useState("");
+
+  const videoRef = useRef(null);
+  const recommendedRef = useRef([]);
+  const playerRef = useRef(null);
+
+  useEffect(() => {
+    videoRef.current = video;
+    recommendedRef.current = recommended;
+  }, [video, recommended]);
 
   // Additional Redesign states
   const [descExpanded, setDescExpanded] = useState(false);
@@ -41,11 +52,15 @@ const VideoPlayer = () => {
 
   const navigate = useNavigate();
 
-  const tapCount = useRef(0);
+  const tapPositions = useRef([]);
   const tapTimer = useRef(null);
-  const touchPosition = useRef("");
-  const isTouchDevice = useRef(false);
-  const touchResetTimeout = useRef(null);
+  const pointerTracker = useRef({
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    isValid: false
+  });
+  const gestureTimeout = useRef(null);
 
   // =========================
   // LOAD VIDEO
@@ -86,7 +101,7 @@ const VideoPlayer = () => {
     setSubscribed(false);
     setDisliked(false);
     setSaved(false);
-  }, [id, maximizePlayer, setCurrentVideo]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
   // =========================
   // HISTORY
   // =========================
@@ -185,137 +200,194 @@ const VideoPlayer = () => {
   // GESTURES
   // =========================
 
-  const showGestureMessage = (msg) => {
-    setGestureMessage(msg);
-    setTimeout(() => {
-      setGestureMessage("");
-    }, 1500);
-  };
+  // Keep a ref to the latest player so processGesture always reads the current
+  // instance even when called from inside the 300 ms debounce timer.
+  useEffect(() => {
+    playerRef.current = player;
+  }, [player]);
 
-  const processGesture = (taps, position) => {
-    // 3. Fix Player Readiness
-    const isPlayerReady = player && typeof player.getCurrentTime === "function" && typeof player.seekTo === "function";
-    if (!isPlayerReady) {
-      console.log("Player not ready - ignoring gesture");
+  const showGestureMessage = useCallback((msg) => {
+    if (gestureTimeout.current) {
+      clearTimeout(gestureTimeout.current);
+    }
+    setGestureMessage(msg);
+    gestureTimeout.current = setTimeout(() => {
+      setGestureMessage("");
+      gestureTimeout.current = null;
+    }, 1500);
+  }, []);
+
+  // processGesture reads player/video/recommended through refs so it always
+  // sees the current values regardless of when the 300 ms timer fires.
+  const processGesture = useCallback((positions) => {
+    const count = positions.length;
+    if (count === 0) return;
+
+    const p = playerRef.current;
+    if (
+      !p ||
+      typeof p.getCurrentTime !== "function" ||
+      typeof p.seekTo !== "function" ||
+      typeof p.playVideo !== "function" ||
+      typeof p.pauseVideo !== "function"
+    ) {
       return;
     }
 
-    // SINGLE TAP
-    if (taps === 1 && position === "center") {
-      if (typeof player.getPlayerState === "function" &&
-        typeof player.pauseVideo === "function" &&
-        typeof player.playVideo === "function") {
-        console.log("Gesture detected: Single Center");
-        const state = player.getPlayerState();
+    // SINGLE TAP – center only
+    if (count === 1) {
+      if (positions[0] === "center") {
+        const state = typeof p.getPlayerState === "function" ? p.getPlayerState() : -1;
         if (state === window.YT.PlayerState.PLAYING) {
-          player.pauseVideo();
+          p.pauseVideo();
         } else {
-          player.playVideo();
+          p.playVideo();
         }
       }
     }
 
-    // DOUBLE TAP
-    if (taps === 2) {
-      const current = typeof player.getCurrentTime === "function" ? player.getCurrentTime() : 0;
-      const duration = typeof player.getDuration === "function" ? player.getDuration() : 0;
-      console.log("player.getCurrentTime() returned:", current);
-      console.log("player.getDuration() returned:", duration);
-
-      if (position === "right") {
-        console.log("Gesture detected: Double Right");
+    // DOUBLE TAP – left / right only
+    if (count === 2) {
+      const current  = p.getCurrentTime();
+      const duration = typeof p.getDuration === "function" ? p.getDuration() : 0;
+      if (positions[0] === "right" && positions[1] === "right") {
         const targetTime = duration > 0 ? Math.min(current + 10, duration) : current + 10;
-        console.log(`Calling player.seekTo() with targetTime: ${targetTime}`);
-        player.seekTo(targetTime, true);
+        p.seekTo(targetTime, true);
         showGestureMessage("⏩ +10 sec");
-      }
-      if (position === "left") {
-        console.log("Gesture detected: Double Left");
+      } else if (positions[0] === "left" && positions[1] === "left") {
         const targetTime = Math.max(current - 10, 0);
-        console.log(`Calling player.seekTo() with targetTime: ${targetTime}`);
-        player.seekTo(targetTime, true);
+        p.seekTo(targetTime, true);
         showGestureMessage("⏪ -10 sec");
       }
     }
 
-    // TRIPLE TAP
-    if (taps === 3) {
-      if (position === "left") {
-        console.log("Gesture detected: Triple Left");
+    // TRIPLE TAP – left / center / right
+    if (count === 3) {
+      const allLeft   = positions.every((pos) => pos === "left");
+      const allCenter = positions.every((pos) => pos === "center");
+      const allRight  = positions.every((pos) => pos === "right");
+
+      if (allLeft) {
         document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
         showGestureMessage("💬 Comments");
-      }
-      if (position === "center") {
-        console.log("Gesture detected: Triple Center");
-        const nextVideos = recommended.filter((v) => video && v._id !== video._id);
+      } else if (allCenter) {
+        const currentVideo       = videoRef.current;
+        const currentRecommended = recommendedRef.current;
+        const nextVideos = currentRecommended.filter(
+          (v) => currentVideo && v._id !== currentVideo._id
+        );
         if (nextVideos.length > 0) {
-          const nextVideo = nextVideos[0];
-          navigate(`/video/${nextVideo._id}`);
           showGestureMessage("⏭️ Next Video");
+          navigate(`/video/${nextVideos[0]._id}`);
         } else {
           showGestureMessage("No recommended videos");
         }
-      }
-      if (position === "right") {
-        console.log("Gesture detected: Triple Right");
-        showGestureMessage("🏠 Go Home & Minimize");
-        navigate("/");
+      } else if (allRight) {
+        showGestureMessage("🚪 Closing Website...");
+        closePlayer();
+        setTimeout(() => {
+          window.close();
+          window.location.href = "about:blank";
+        }, 800);
       }
     }
-  };
+  }, [navigate, showGestureMessage]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handlePointerDown = (e) => {
-    if (!player) return;
+  const registerTap = useCallback((position) => {
+    tapPositions.current.push(position);
 
-    if (e.pointerType === "touch" || isTouchDevice.current) {
-      return;
+    if (tapTimer.current) {
+      clearTimeout(tapTimer.current);
+      tapTimer.current = null;
     }
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    if (tapPositions.current.length >= 3) {
+      // Triple tap: fire immediately
+      const finalPositions = [...tapPositions.current];
+      tapPositions.current = [];
+      processGesture(finalPositions);
+    } else {
+      // Wait 300 ms to distinguish single from double tap
+      tapTimer.current = setTimeout(() => {
+        const finalPositions = [...tapPositions.current];
+        tapPositions.current = [];
+        tapTimer.current = null;
+        processGesture(finalPositions);
+      }, 300);
+    }
+  }, [processGesture]);
 
-    let position;
-    if (x < rect.width / 3) { position = "left"; }
-    else if (x > (rect.width * 2) / 3) { position = "right"; }
-    else { position = "center"; }
 
-    tapCount.current++;
-    clearTimeout(tapTimer.current);
+  const handlePointerDown = useCallback((e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
 
-    tapTimer.current = setTimeout(() => {
-      const taps = tapCount.current;
-      tapCount.current = 0;
-      processGesture(taps, position);
-    }, 450);
-  };
+    // Lock all pointer events for this pointer ID to this element.
+    // Without this, the YouTube cross-origin iframe steals pointermove
+    // and pointerup the moment the pointer drifts over it.
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
 
-  const handleTouchStart = (e) => {
-    if (!player) return;
+    pointerTracker.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      isValid: true,
+      element: e.currentTarget,
+    };
+  }, []);
 
-    isTouchDevice.current = true;
-    if (touchResetTimeout.current) clearTimeout(touchResetTimeout.current);
-    touchResetTimeout.current = setTimeout(() => {
-      isTouchDevice.current = false;
-    }, 1500);
+  const handlePointerMove = useCallback((e) => {
+    const tracker = pointerTracker.current;
+    if (!tracker.isValid || tracker.pointerId !== e.pointerId) return;
+    const dx = e.clientX - tracker.startX;
+    const dy = e.clientY - tracker.startY;
+    // 20px threshold — tolerates normal tap drift on touch (5-8px) while
+    // still correctly rejecting intentional swipes (>40px).
+    if (Math.sqrt(dx * dx + dy * dy) > 20) {
+      tracker.isValid = false;
+    }
+  }, []);
 
-    const touch = e.touches[0];
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = touch.clientX - rect.left;
+  const handlePointerUp = useCallback((e) => {
+    const tracker = pointerTracker.current;
+    if (tracker.pointerId === null || tracker.pointerId !== e.pointerId) return;
 
-    if (x < rect.width / 3) { touchPosition.current = "left"; }
-    else if (x > (rect.width * 2) / 3) { touchPosition.current = "right"; }
-    else { touchPosition.current = "center"; }
+    if (tracker.isValid) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x    = e.clientX - rect.left;
+      let pos    = "center";
+      if (x < rect.width / 3)           pos = "left";
+      else if (x > (rect.width * 2) / 3) pos = "right";
+      registerTap(pos);
+    }
 
-    tapCount.current++;
-    clearTimeout(tapTimer.current);
+    // Release capture so subsequent pointer events go back to the page normally.
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) {}
+    pointerTracker.current = { pointerId: null, startX: 0, startY: 0, isValid: false, element: null };
+  }, [registerTap]);
 
-    tapTimer.current = setTimeout(() => {
-      const taps = tapCount.current;
-      tapCount.current = 0;
-      const position = touchPosition.current;
-      processGesture(taps, position);
-    }, 450);
-  };
+  const handlePointerCancel = useCallback((e) => {
+    const tracker = pointerTracker.current;
+    if (tracker.pointerId === null || tracker.pointerId !== e.pointerId) return;
+
+    // Browsers fire pointercancel instead of pointerup when:
+    //   (a) the browser decides to scroll (even with touch-action:manipulation)
+    //   (b) pointer capture is released externally
+    // If the tap was still valid at cancel time, register it anyway.
+    if (tracker.isValid) {
+      const el = tracker.element || e.currentTarget;
+      const rect = el.getBoundingClientRect();
+      const x    = e.clientX - rect.left;
+      let pos    = "center";
+      if (x < rect.width / 3)           pos = "left";
+      else if (x > (rect.width * 2) / 3) pos = "right";
+      registerTap(pos);
+    }
+
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) {}
+    pointerTracker.current = { pointerId: null, startX: 0, startY: 0, isValid: false, element: null };
+  }, [registerTap]);
+
+
 
   // =========================
   // RENDER HELPERS
@@ -326,9 +398,15 @@ const VideoPlayer = () => {
 
     return () => {
       minimizePlayer();
+      if (tapTimer.current) {
+        clearTimeout(tapTimer.current);
+      }
+      if (gestureTimeout.current) {
+        clearTimeout(gestureTimeout.current);
+      }
     };
 
-  }, [maximizePlayer, minimizePlayer]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   if (!video) {
     return <div className="vp-loading">Loading...</div>;
   }
@@ -362,19 +440,24 @@ const VideoPlayer = () => {
 
               <PlayerContainer />
 
+              {/* Touch layer MUST be last child so it paints on top of the iframe */}
               <div
                 className="vp-touch-layer"
                 onPointerDown={handlePointerDown}
-                onTouchStart={handleTouchStart}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
               />
+
+              {/* Overlay lives inside the same stacking context as the touch layer */}
+              {gestureMessage && (
+                <div className="vp-gesture-overlay">
+                  {gestureMessage}
+                </div>
+              )}
 
             </div>
 
-            {gestureMessage && (
-              <div className="vp-gesture-overlay">
-                {gestureMessage}
-              </div>
-            )}
 
           </div>
 
