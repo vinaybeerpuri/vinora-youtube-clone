@@ -1,6 +1,6 @@
 /* ============================================================
    Home.css — Layout for the Home page
-   Desktop layout is UNCHANGED. Mobile breakpoint: 768px.
+   Accounts for: fixed navbar (56px) + collapsible sidebar
    ============================================================ */
 
 /* ── Page shell ────────────────────────────────────────────── */
@@ -8,62 +8,78 @@
   background: #0f0f0f;
   min-height: 100vh;
   color: white;
-  overflow-x: hidden; /* prevent horizontal scroll */
+  overflow-x: hidden;
 }
 
 /* ── Sidebar + main wrapper ────────────────────────────────── */
 .home-body {
   display: flex;
+  padding-top: 56px; /* offset for fixed navbar */
 }
 
 /* ── Main content area ─────────────────────────────────────── */
 .home-main {
   flex: 1;
-  padding: 25px;
-  margin-left: 260px; /* matches fixed sidebar width (220px) + its padding */
-  min-width: 0;       /* prevent flex child overflow */
+  padding: 24px 24px 40px;
+  /* Collapsed sidebar = 72px */
+  margin-left: 72px;
+  min-width: 0;
   box-sizing: border-box;
+  transition: margin-left 250ms ease;
+}
+
+/* When sidebar is expanded (240px), push content right */
+.home-body.sidebar-expanded .home-main {
+  margin-left: 240px;
 }
 
 /* ── Section heading ───────────────────────────────────────── */
 .home-heading {
-  font-size: 28px;
-  margin-bottom: 25px;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
   margin-top: 0;
+  color: #f1f1f1;
 }
 
 /* ── Video grid ────────────────────────────────────────────── */
 .home-video-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  gap: 24px;
 }
 
 /* ── Empty state ───────────────────────────────────────────── */
 .home-empty {
   color: #aaa;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 /* ============================================================
    MOBILE  ≤ 768px
    ============================================================ */
 @media (max-width: 768px) {
-  /* Main takes full width — sidebar is hidden via Sidebar.css */
+  .home-body {
+    padding-top: 56px; /* MobileTopBar height */
+  }
+
   .home-main {
     margin-left: 0;
-    padding: 14px 12px;
+    padding: 12px 12px 80px; /* bottom padding for BottomNavbar */
   }
 
-  /* Scale down section heading */
+  /* Expanded sidebar = drawer overlay, no content shift */
+  .home-body.sidebar-expanded .home-main {
+    margin-left: 0;
+  }
+
   .home-heading {
-    font-size: 20px;
-    margin-bottom: 16px;
+    font-size: 18px;
+    margin-bottom: 14px;
   }
 
-  /* Single-column grid */
   .home-video-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 }

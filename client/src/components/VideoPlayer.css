@@ -6,7 +6,7 @@
   background: #0f0f0f;
   color: white;
   min-height: 100vh;
-  padding: 24px;
+  padding: 80px 24px 24px; /* 56px navbar + 24px gap */
   box-sizing: border-box;
   overflow-x: hidden;
 }
@@ -56,40 +56,51 @@
 }
 
 /* ── Gesture Message Overlay ────────────────────────────────── */
+/* Base overlay — shared by left and right */
 .vp-gesture-overlay {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.8);
+  transform: translateY(-50%);
+  background: transparent;
   color: white;
-  padding: 14px 24px;
-  border-radius: 20px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 700;
   pointer-events: none;
   z-index: 100000;
-  animation: overlay-fade 0.8s ease-in-out forwards;
+  user-select: none;
+  animation: gesture-fade 650ms ease forwards;
 }
 
-@keyframes overlay-fade {
+/* RIGHT double-tap: ~18% from right edge */
+.vp-gesture-overlay--right {
+  right: 18%;
+  left: auto;
+  text-align: center;
+}
+
+/* LEFT double-tap: ~18% from left edge */
+.vp-gesture-overlay--left {
+  left: 18%;
+  right: auto;
+  text-align: center;
+}
+
+@keyframes gesture-fade {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
+    transform: translateY(-50%) scale(0.85);
   }
-
   15% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translateY(-50%) scale(1);
   }
-
-  85% {
+  75% {
     opacity: 1;
+    transform: translateY(-50%) scale(1);
   }
-
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.95);
+    transform: translateY(-50%) scale(1);
   }
 }
 
@@ -422,7 +433,7 @@
   }
 
   .vp-page {
-    padding: 0 0 16px 0;
+    padding: 0 0 80px 0;
   }
 
   .vp-layout {

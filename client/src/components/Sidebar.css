@@ -1,24 +1,184 @@
 /* ============================================================
-   Sidebar.css — Hide sidebar on mobile screens (≤ 768px)
-   Desktop layout is UNCHANGED.
+   Sidebar.css — YouTube-style collapsible sidebar
+   Collapsed:  72px  (icons only)
+   Expanded:  240px  (icons + labels)
+   Animation: 250ms ease
    ============================================================ */
 
+/* ── Sidebar shell ─────────────────────────────────────────── */
 .vinora-sidebar {
-  width: 220px;
-  background-color: #181818;
-  color: white;
-  min-height: calc(100vh - 60px);
-  padding: 20px;
   position: fixed;
-  top: 60px;
+  top: 56px; /* below fixed navbar */
   left: 0;
-  z-index: 100;
+  bottom: 0;
+  width: 72px; /* collapsed default */
+  background: #0f0f0f;
+  z-index: 900;
+  overflow: hidden;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  transition: width 250ms ease;
+  padding: 8px 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-/* ── MOBILE: hide the sidebar entirely ─────────────────────── */
+.vinora-sidebar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* ── Expanded state ──────────────────────────────────────────  */
+.vinora-sidebar.vinora-sidebar--expanded {
+  width: 240px;
+}
+
+/* ── Section labels (only visible when expanded) ─────────── */
+.vinora-sidebar__section-label {
+  display: block;
+  color: #aaa;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 12px 20px 4px;
+  white-space: nowrap;
+}
+
+/* ── Dividers ──────────────────────────────────────────────── */
+.vinora-sidebar__divider {
+  border: none;
+  border-top: 1px solid #272727;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.vinora-sidebar__mini-divider {
+  height: 1px;
+  background: #272727;
+  margin: 6px 12px;
+  border-radius: 1px;
+}
+
+/* ── Sidebar nav item ──────────────────────────────────────── */
+.vinora-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #f1f1f1;
+  text-decoration: none;
+  margin: 1px 4px;
+  min-height: 48px;
+  transition: background 0.15s ease;
+  overflow: hidden;
+  white-space: nowrap;
+  /* Collapsed: centre the icon */
+  justify-content: center;
+}
+
+.vinora-sidebar__item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.vinora-sidebar__item.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Expanded item: left-align icon + label */
+.vinora-sidebar__item.expanded {
+  justify-content: flex-start;
+  padding: 0 16px;
+  gap: 16px;
+  margin: 1px 8px;
+}
+
+/* ── Icon ──────────────────────────────────────────────────── */
+.vinora-sidebar__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.vinora-sidebar__icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #f1f1f1;
+}
+
+.vinora-sidebar__item.active .vinora-sidebar__icon svg {
+  fill: white;
+}
+
+/* ── Label (only rendered in expanded mode) ─────────────────── */
+.vinora-sidebar__label {
+  font-size: 13.5px;
+  font-weight: 400;
+  color: #f1f1f1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vinora-sidebar__item.active .vinora-sidebar__label {
+  font-weight: 600;
+}
+
+/* ── Mobile backdrop overlay ─────────────────────────────────── */
+.vinora-sidebar__backdrop {
+  display: none;
+}
+
+/* ============================================================
+   MOBILE  ≤ 768px
+   Sidebar becomes a slide-in drawer from the left.
+   Hidden by default (translateX(-100%)).
+   Expanded: translateX(0).
+   ============================================================ */
 @media (max-width: 768px) {
   .vinora-sidebar {
-    display: none;
+    width: 240px; /* full width drawer on mobile */
+    top: 0;
+    transform: translateX(-100%);
+    transition: transform 250ms ease;
+    z-index: 1050; /* above most content, below navbar */
+    background: #212121;
+    padding-top: 64px; /* space for the navbar */
+  }
+
+  .vinora-sidebar.vinora-sidebar--expanded {
+    width: 240px;
+    transform: translateX(0);
+  }
+
+  /* Force labels visible on mobile drawer */
+  .vinora-sidebar__item {
+    justify-content: flex-start;
+    padding: 0 16px;
+    gap: 16px;
+    margin: 1px 8px;
+  }
+
+  .vinora-sidebar__label {
+    display: block;
+  }
+
+  /* Show backdrop on mobile when sidebar is open */
+  .vinora-sidebar__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1049; /* just below the drawer */
+  }
+
+  .vinora-sidebar__section-label {
+    padding: 12px 20px 4px;
   }
 }

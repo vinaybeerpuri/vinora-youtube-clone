@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import VideoCard from "../components/VideoCard";
+import { useSidebar } from "../context/SidebarContext";
 import "./Home.css";
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
+  const { isExpanded } = useSidebar();
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -33,7 +35,7 @@ const Home = () => {
     <div className="home-page">
       <Navbar />
 
-      <div className="home-body">
+      <div className={`home-body${isExpanded ? " sidebar-expanded" : ""}`}>
         <Sidebar />
 
         <main className="home-main">
@@ -42,9 +44,16 @@ const Home = () => {
           {videos.length === 0 ? (
             <h3 className="home-empty">No videos available</h3>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", gap: "20px" }}>              {videos.map((video) => (
-              <VideoCard key={video._id} video={video} />
-            ))}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))",
+                gap: "20px",
+              }}
+            >
+              {videos.map((video) => (
+                <VideoCard key={video._id} video={video} />
+              ))}
             </div>
           )}
         </main>

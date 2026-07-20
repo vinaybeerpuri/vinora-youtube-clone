@@ -33,7 +33,7 @@ const VideoPlayer = () => {
   const [video, setVideo] = useState(null);
   const [recommended, setRecommended] = useState([]);
   const [likes, setLikes] = useState(0);
-  const [gestureMessage, setGestureMessage] = useState("");
+  const [gestureMessage, setGestureMessage] = useState(null);
 
   const videoRef = useRef(null);
   const recommendedRef = useRef([]);
@@ -206,13 +206,13 @@ const VideoPlayer = () => {
     playerRef.current = player;
   }, [player]);
 
-  const showGestureMessage = useCallback((msg) => {
+  const showGestureMessage = useCallback((text, side = "center") => {
     if (gestureTimeout.current) {
       clearTimeout(gestureTimeout.current);
     }
-    setGestureMessage(msg);
+    setGestureMessage({ text, side });
     gestureTimeout.current = setTimeout(() => {
-      setGestureMessage("");
+      setGestureMessage(null);
       gestureTimeout.current = null;
     }, 1500);
   }, []);
@@ -253,11 +253,11 @@ const VideoPlayer = () => {
       if (positions[0] === "right" && positions[1] === "right") {
         const targetTime = duration > 0 ? Math.min(current + 10, duration) : current + 10;
         p.seekTo(targetTime, true);
-        showGestureMessage("⏩ +10 sec");
+        showGestureMessage(">10", "right");
       } else if (positions[0] === "left" && positions[1] === "left") {
         const targetTime = Math.max(current - 10, 0);
         p.seekTo(targetTime, true);
-        showGestureMessage("⏪ -10 sec");
+        showGestureMessage("<10", "left");
       }
     }
 
@@ -269,7 +269,6 @@ const VideoPlayer = () => {
 
       if (allLeft) {
         document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
-        showGestureMessage("💬 Comments");
       } else if (allCenter) {
         const currentVideo       = videoRef.current;
         const currentRecommended = recommendedRef.current;
@@ -277,13 +276,9 @@ const VideoPlayer = () => {
           (v) => currentVideo && v._id !== currentVideo._id
         );
         if (nextVideos.length > 0) {
-          showGestureMessage("⏭️ Next Video");
           navigate(`/video/${nextVideos[0]._id}`);
-        } else {
-          showGestureMessage("No recommended videos");
         }
       } else if (allRight) {
-        showGestureMessage("🚪 Closing Website...");
         closePlayer();
         setTimeout(() => {
           window.close();
@@ -451,8 +446,8 @@ const VideoPlayer = () => {
 
               {/* Overlay lives inside the same stacking context as the touch layer */}
               {gestureMessage && (
-                <div className="vp-gesture-overlay">
-                  {gestureMessage}
+                <div className={`vp-gesture-overlay vp-gesture-overlay--${gestureMessage.side}`}>
+                  {gestureMessage.text}
                 </div>
               )}
 

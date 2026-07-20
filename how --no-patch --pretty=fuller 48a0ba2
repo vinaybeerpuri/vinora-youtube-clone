@@ -1,0 +1,7 @@
+[33m48a0ba2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m ...
+ ck --lost-found                      |  49 [32m+++++++++++++[m
+ client/src/components/MainLayout.css |  52 [32m++++++++++++++[m
+ client/src/components/MainLayout.jsx |  41 [32m+++++++++++[m
+ client/src/context/LayoutContext.jsx |  44 [32m++++++++++++[m
+ client/src/data/fallbackVideos.js    | 135 [32m+++++++++++++++++++++++++++++++++++[m
+ 5 files changed, 321 insertions(+)

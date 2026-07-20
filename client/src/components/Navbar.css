@@ -1,55 +1,209 @@
 /* ============================================================
-   Navbar.css — Desktop + Mobile responsive styles
-   Desktop layout is UNCHANGED. Mobile breakpoint: 768px.
+   Navbar.css — YouTube 2026 Desktop layout
+   Fixed top bar, 56px height, 3-section flex
    ============================================================ */
 
 /* ---------- Root container ---------- */
 .vinora-navbar {
-  height: 65px;
-  background: #202020;
+  height: 56px;
+  background: #0f0f0f;
   color: white;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 25px;
-  position: sticky;
+  padding: 0 16px;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
-  gap: 12px;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+/* ── LEFT section ── */
+.vinora-navbar__left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* ── Hamburger ── */
+.vinora-navbar__hamburger {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.vinora-navbar__hamburger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.vinora-navbar__hamburger svg {
+  width: 24px;
+  height: 24px;
+  fill: white;
 }
 
 /* ---------- Logo ---------- */
 .vinora-navbar__logo {
   text-decoration: none;
-  color: red;
+  color: white;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
 }
 
 .vinora-navbar__logo img {
-  height: 38px;
+  height: 34px;
   width: auto;
   object-fit: contain;
   display: block;
 }
 
-/* ---------- Search ---------- */
-.vinora-navbar__search {
-  width: 450px;
-  padding: 12px 20px;
-  border-radius: 25px;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  flex-shrink: 1;
-  min-width: 0;
+/* ── CENTER section ── */
+.vinora-navbar__center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 728px;
+  margin: 0 auto;
 }
 
-/* ---------- Right menu ---------- */
+/* ---------- Search wrapper ---------- */
+.vinora-navbar__search-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 560px;
+  height: 38px;
+  border: 1px solid #303030;
+  border-radius: 0 20px 20px 0;
+  overflow: visible;
+}
+
+/* Search input */
+.vinora-navbar__search {
+  flex: 1;
+  height: 100%;
+  background: #121212;
+  color: white;
+  border: 1px solid #303030;
+  border-right: none;
+  border-radius: 20px 0 0 20px;
+  padding: 0 16px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.vinora-navbar__search:focus {
+  border-color: #3ea6ff;
+}
+
+.vinora-navbar__search::placeholder {
+  color: #717171;
+}
+
+/* Search button */
+.vinora-navbar__search-btn {
+  width: 64px;
+  height: 38px;
+  background: #222222;
+  border: 1px solid #303030;
+  border-left: none;
+  border-radius: 0 20px 20px 0;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.vinora-navbar__search-btn:hover {
+  background: #2f2f2f;
+}
+
+.vinora-navbar__search-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+/* Voice button */
+.vinora-navbar__voice-btn {
+  width: 40px;
+  height: 40px;
+  background: #222222;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.vinora-navbar__voice-btn:hover {
+  background: #2f2f2f;
+}
+
+.vinora-navbar__voice-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
+}
+
+/* ── RIGHT section ── */
 .vinora-navbar__right {
   display: flex;
   align-items: center;
-  gap: 18px;
-  flex-shrink: 0;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+/* Generic icon button (notifications, etc.) */
+.vinora-navbar__icon-btn {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.vinora-navbar__icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.vinora-navbar__icon-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
 }
 
 /* ---------- Create button wrapper ---------- */
@@ -58,38 +212,61 @@
 }
 
 .vinora-navbar__create-btn {
-  padding: 10px 18px;
-  border-radius: 20px;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 36px;
+  border-radius: 18px;
+  border: 1px solid #303030;
+  background: transparent;
+  color: white;
   cursor: pointer;
-  font-weight: bold;
+  font-size: 13.5px;
+  font-weight: 500;
   white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.vinora-navbar__create-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.vinora-navbar__create-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
 }
 
 /* ---------- Create dropdown ---------- */
 .vinora-navbar__create-menu {
   position: absolute;
-  top: 45px;
+  top: 44px;
   right: 0;
-  background: white;
-  color: black;
-  width: 180px;
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  background: #212121;
+  color: white;
+  width: 196px;
+  border-radius: 12px;
+  padding: 8px 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
   z-index: 1100;
 }
 
 .vinora-navbar__create-menu p {
   cursor: pointer;
-  margin: 6px 0;
+  margin: 0;
+  padding: 10px 16px;
+  font-size: 14px;
+  transition: background 0.12s;
+}
+
+.vinora-navbar__create-menu p:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* ---------- Notification icon ---------- */
 .vinora-navbar__notif {
-  font-size: 22px;
-  cursor: pointer;
-  flex-shrink: 0;
+  position: relative;
 }
 
 /* ---------- Profile wrapper ---------- */
@@ -98,106 +275,96 @@
 }
 
 .vinora-navbar__avatar {
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
   display: block;
+  object-fit: cover;
+  margin-left: 4px;
 }
 
 /* ---------- Profile dropdown ---------- */
 .vinora-navbar__profile-menu {
   position: absolute;
   right: 0;
-  top: 55px;
+  top: 48px;
   width: 300px;
-  background: white;
-  color: black;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  background: #212121;
+  color: white;
+  border-radius: 12px;
+  padding: 12px 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
   z-index: 1100;
 }
 
 .vinora-navbar__profile-header {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   align-items: center;
+  padding: 8px 16px 12px;
 }
 
 .vinora-navbar__profile-header img {
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  object-fit: cover;
+}
+
+.vinora-navbar__profile-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.vinora-navbar__profile-header p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.vinora-navbar__profile-menu hr {
+  border: none;
+  border-top: 1px solid #383838;
+  margin: 6px 0;
 }
 
 .vinora-navbar__profile-menu p {
   cursor: pointer;
-  margin: 6px 0;
+  margin: 0;
+  padding: 8px 16px;
+  font-size: 14px;
+  transition: background 0.12s;
+}
+
+.vinora-navbar__profile-menu p:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* ---------- Auth buttons (logged-out) ---------- */
 .vinora-navbar__auth-btn {
-  padding: 8px 15px;
+  padding: 6px 14px;
+  border: 1px solid #3ea6ff;
+  border-radius: 18px;
+  background: transparent;
+  color: #3ea6ff;
   cursor: pointer;
-  font-weight: bold;
+  font-size: 13.5px;
+  font-weight: 500;
   white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.vinora-navbar__auth-btn:hover {
+  background: rgba(62, 166, 255, 0.1);
 }
 
 /* ============================================================
-   MOBILE  ≤ 768px
-   Strategy: wrap to two rows
-     Row 1 → logo | right-controls
-     Row 2 → full-width search bar
+   MOBILE  ≤ 768px — hide desktop navbar, MobileTopBar takes over
    ============================================================ */
 @media (max-width: 768px) {
-  /* ── Hide desktop navbar — MobileTopBar takes over ───────── */
   .vinora-navbar {
     display: none;
-  }
-
-  /* Logo stays left, takes natural width */
-  .vinora-navbar__logo {
-    flex: 0 0 auto;
-  }
-
-  /* Right controls stay right on the first row */
-  .vinora-navbar__right {
-    flex: 0 0 auto;
-    margin-left: auto;
-    gap: 12px;
-  }
-
-  /* Search drops to its own full-width second row */
-  .vinora-navbar__search {
-    width: 100%;
-    order: 3; /* push below logo + right row */
-    flex: 0 0 100%;
-    padding: 9px 16px;
-    font-size: 14px;
-  }
-
-  /* Shrink Create button text on very small screens */
-  .vinora-navbar__create-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  /* Keep the auth buttons from overflowing */
-  .vinora-navbar__auth-btn {
-    padding: 7px 10px;
-    font-size: 13px;
-  }
-
-  /* Profile dropdown: keep it inside viewport */
-  .vinora-navbar__profile-menu {
-    width: min(300px, calc(100vw - 28px));
-    right: 0;
-  }
-
-  /* Create dropdown: keep inside viewport */
-  .vinora-navbar__create-menu {
-    width: min(180px, calc(100vw - 28px));
-    right: 0;
   }
 }

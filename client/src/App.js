@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { PlayerProvider } from "./context/PlayerContext";
+import { SidebarProvider } from "./context/SidebarContext";
 import { useTheme } from "./context/ThemeContext";
 import MiniPlayer from "./components/MiniPlayer";
 import BottomNavbar from "./components/BottomNavbar";
@@ -25,6 +26,7 @@ function App() {
   const { theme } = useTheme();
 
   return (
+    <SidebarProvider>
     <PlayerProvider>
       <div className={`app ${theme === "light" ? "light" : ""}`} style={{ minHeight: "100vh" }}>
         <MobileTopBar />
@@ -114,6 +116,7 @@ function App() {
         <MiniPlayer />
       </div>
     </PlayerProvider>
+    </SidebarProvider>
   );
 }
 
