@@ -34,6 +34,7 @@ const VideoPlayer = () => {
   const [recommended, setRecommended] = useState([]);
   const [likes, setLikes] = useState(0);
   const [gestureMessage, setGestureMessage] = useState(null);
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const videoRef = useRef(null);
   const recommendedRef = useRef([]);
@@ -154,13 +155,60 @@ const VideoPlayer = () => {
   // =========================
 
   const likeVideo = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Login required to like videos");
+      return;
+    }
+    if (!user || !user._id) {
+      alert("Login required to like videos");
+      return;
+    }
+
+    // Optimistically toggle
+    const isAlreadyLiked = video?.likedBy?.includes(user._id);
+    let updatedLikedBy = video?.likedBy ? [...video.likedBy] : [];
+    if (isAlreadyLiked) {
+      updatedLikedBy = updatedLikedBy.filter(uid => uid !== user._id);
+    } else {
+      updatedLikedBy.push(user._id);
+    }
+
+    const previousLikes = likes;
+    const previousLikedBy = video?.likedBy || [];
+
+    setLikes(updatedLikedBy.length);
+    setVideo(prev => ({
+      ...prev,
+      likedBy: updatedLikedBy
+    }));
+    setDisliked(false);
+
     try {
-      const res = await fetch(`${API}/api/videos/${id}/like`, { method: "PUT" });
+      const res = await fetch(`${API}/api/videos/${id}/like`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        throw new Error("Failed to sync like with server");
+      }
       const data = await res.json();
       setLikes(data.likes || 0);
-      setDisliked(false); // Reset dislike if liked
+      setVideo(prev => ({
+        ...prev,
+        likedBy: data.likedBy || []
+      }));
     } catch (error) {
       console.log(error);
+      // Revert UI on error
+      setLikes(previousLikes);
+      setVideo(prev => ({
+        ...prev,
+        likedBy: previousLikedBy
+      }));
     }
   };
 
@@ -468,7 +516,11 @@ const VideoPlayer = () => {
           <div className="vp-actions">
             {/* Split Pill: Like & Dislike */}
             <div className="vp-split-pill-group">
-              <button className="vp-split-pill-left" onClick={likeVideo}>
+              <button
+                className="vp-split-pill-left"
+                onClick={likeVideo}
+                style={{ color: video?.likedBy?.includes(user?._id) ? "#3ea6ff" : "" }}
+              >
                 <svg viewBox="0 0 24 24">
                   <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
                 </svg>

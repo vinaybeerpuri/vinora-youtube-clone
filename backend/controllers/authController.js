@@ -41,17 +41,12 @@ const registerUser = async (req, res) => {
         });
 
         // Send OTP
-        const isSouth = isSouthIndia(state);
-        if (isSouth) {
-            await sendOtpEmail(email, otp);
-        } else {
-            await sendOtpMobile(mobile, otp);
-        }
+        await sendOtpEmail(email, otp);
 
         res.status(201).json({
             pendingOtp: true,
             userId: user._id,
-            otpChannel: isSouth ? "email" : "mobile",
+            otpChannel: "email",
             message: "OTP sent successfully. Please verify to complete registration."
         });
 
@@ -91,18 +86,12 @@ const loginUser = async (req, res) => {
         await user.save();
 
         // Send OTP
-        const isSouth = isSouthIndia(user.state);
-        if (isSouth) {
-            await sendOtpEmail(user.email, otp);
-        } else {
-            await sendOtpMobile(user.mobile, otp);
-        }
+        await sendOtpEmail(user.email, otp);
 
         res.status(200).json({
             pendingOtp: true,
             userId: user._id,
-            otpChannel: isSouth ? "email" : "mobile",
-            message: "OTP sent successfully. Please verify to complete login."
+            otpChannel: "email", message: "OTP sent successfully. Please verify to complete login."
         });
 
     } catch (error) {
@@ -155,7 +144,7 @@ const verifyOtp = async (req, res) => {
         const hour = istDate.getHours();
         const minute = istDate.getMinutes();
         const totalMinutes = hour * 60 + minute;
-        
+
         // Window: 10:00 AM IST (600 mins) to 12:00 PM IST (720 mins)
         const isMorningWindow = totalMinutes >= 10 * 60 && totalMinutes <= 12 * 60;
         const isSouth = isSouthIndia(user.state);
@@ -200,17 +189,11 @@ const resendOtp = async (req, res) => {
         user.otpExpiry = otpExpiry;
         await user.save();
 
-        const isSouth = isSouthIndia(user.state);
-        if (isSouth) {
-            await sendOtpEmail(user.email, otp);
-        } else {
-            await sendOtpMobile(user.mobile, otp);
-        }
+        await sendOtpEmail(user.email, otp);
 
         res.status(200).json({
             success: true,
-            otpChannel: isSouth ? "email" : "mobile",
-            message: "OTP resent successfully."
+            otpChannel: "email", message: "OTP resent successfully."
         });
 
     } catch (error) {

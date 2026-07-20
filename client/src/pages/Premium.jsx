@@ -1,6 +1,24 @@
 import React from "react";
 import Navbar from "../components/Navbar";
 import API from "../config/api";
+const loadRazorpay = () => {
+    return new Promise((resolve) => {
+        if (window.Razorpay) {
+            resolve(true);
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+
+        script.onload = () => resolve(true);
+
+        script.onerror = () => resolve(false);
+
+        document.body.appendChild(script);
+    });
+};
 
 
 const Premium = () => {
@@ -25,6 +43,12 @@ const Premium = () => {
 
 
         try {
+            const sdkLoaded = await loadRazorpay();
+
+            if (!sdkLoaded) {
+                alert("Unable to load Razorpay SDK.");
+                return;
+            }
 
 
             // CREATE ORDER
@@ -90,14 +114,9 @@ const Premium = () => {
 
 
 
-            if (!window.Razorpay) {
-
-                alert(
-                    "Razorpay SDK not loaded"
-                );
-
+            if (typeof window.Razorpay === "undefined") {
+                alert("Razorpay SDK failed to load.");
                 return;
-
             }
 
 

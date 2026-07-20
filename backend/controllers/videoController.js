@@ -1,4 +1,5 @@
 const Video = require("../models/Video");
+const mongoose = require("mongoose");
 
 
 // ==============================
@@ -93,6 +94,11 @@ const getVideos = async (req, res) => {
 const getVideoById = async (req, res) => {
 
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({
+                message: "Invalid Video ID"
+            });
+        }
 
         const video =
             await Video.findById(req.params.id);
@@ -135,35 +141,45 @@ const getVideoById = async (req, res) => {
 const likeVideo = async (req, res) => {
 
     try {
+        const { id } = req.params;
 
-        const video =
-            await Video.findById(req.params.id);
-
-
-        if (!video) {
-
-            return res.status(404).json({
-
-                message: "Video not found"
-
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid Video ID"
             });
-
         }
 
+        const video = await Video.findById(id);
 
-        video.likes =
-            (video.likes || 0) + 1;
+        if (!video) {
+            return res.status(404).json({
+                message: "Video not found"
+            });
+        }
 
+        // Initialize likedBy if empty
+        if (!video.likedBy) {
+            video.likedBy = [];
+        }
 
+        const userId = req.user.id;
+        const isLiked = video.likedBy.includes(userId);
+
+        if (isLiked) {
+            // Remove the user from likedBy (unlike)
+            video.likedBy = video.likedBy.filter(uid => uid.toString() !== userId.toString());
+        } else {
+            // Add the user to likedBy (like)
+            video.likedBy.push(userId);
+        }
+
+        video.likes = video.likedBy.length;
         await video.save();
 
-
         res.status(200).json({
-
-            likes: video.likes
-
+            likes: video.likes,
+            likedBy: video.likedBy
         });
-
 
     } catch (error) {
 

@@ -146,6 +146,7 @@ router.get(
 
 router.put(
     "/:id/like",
+    authMiddleware,
     likeVideo
 );
 

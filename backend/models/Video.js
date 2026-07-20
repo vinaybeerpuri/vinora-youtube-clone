@@ -40,6 +40,13 @@ const videoSchema = new mongoose.Schema(
         },
 
 
+        likedBy: {
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: "User",
+            default: []
+        },
+
+
         subscribers: {
             type: Number,
             default: 1000
