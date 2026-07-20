@@ -149,6 +149,20 @@ const likeVideo = async (req, res) => {
             });
         }
 
+        if (!req.user?.id) {
+            return res.status(401).json({
+                message: "Unauthorized"
+            });
+        }
+
+        const userId = req.user.id;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(401).json({
+                message: "Invalid user ID"
+            });
+        }
+
         const video = await Video.findById(id);
 
         if (!video) {
@@ -157,19 +171,20 @@ const likeVideo = async (req, res) => {
             });
         }
 
-        // Initialize likedBy if empty
-        if (!video.likedBy) {
+        if (!Array.isArray(video.likedBy)) {
             video.likedBy = [];
         }
 
-        const userId = req.user.id;
-        const isLiked = video.likedBy.includes(userId);
+        const userIdStr = userId.toString();
+        const isLiked = video.likedBy.some(
+            (uid) => uid.toString() === userIdStr
+        );
 
         if (isLiked) {
-            // Remove the user from likedBy (unlike)
-            video.likedBy = video.likedBy.filter(uid => uid.toString() !== userId.toString());
+            video.likedBy = video.likedBy.filter(
+                (uid) => uid.toString() !== userIdStr
+            );
         } else {
-            // Add the user to likedBy (like)
             video.likedBy.push(userId);
         }
 
@@ -178,7 +193,8 @@ const likeVideo = async (req, res) => {
 
         res.status(200).json({
             likes: video.likes,
-            likedBy: video.likedBy
+            likedBy: video.likedBy,
+            liked: !isLiked
         });
 
     } catch (error) {

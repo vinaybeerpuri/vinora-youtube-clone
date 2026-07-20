@@ -35,6 +35,11 @@ const VideoPlayer = () => {
   const [likes, setLikes] = useState(0);
   const [gestureMessage, setGestureMessage] = useState(null);
   const user = JSON.parse(localStorage.getItem("user") || "null");
+  const getUserId = () => user?._id || user?.id;
+  const isLikedByUser = (likedBy = [], userId) => {
+    if (!userId) return false;
+    return likedBy.some((uid) => String(uid) === String(userId));
+  };
 
   const videoRef = useRef(null);
   const recommendedRef = useRef([]);
@@ -75,7 +80,11 @@ const VideoPlayer = () => {
         setVideo(videoData);
         setCurrentVideo(videoData);
         maximizePlayer();
-        setLikes(videoData.likes || 0);
+        setLikes(
+          Array.isArray(videoData.likedBy)
+            ? videoData.likedBy.length
+            : videoData.likes || 0
+        );
 
         const allRes = await fetch(`${API}/api/videos`); const allData = await allRes.json();
         setRecommended(Array.isArray(allData) ? allData : []);
@@ -156,31 +165,34 @@ const VideoPlayer = () => {
 
   const likeVideo = async () => {
     const token = localStorage.getItem("token");
+    const userId = getUserId();
     if (!token) {
       alert("Login required to like videos");
       return;
     }
-    if (!user || !user._id) {
+    if (!userId) {
       alert("Login required to like videos");
       return;
     }
 
-    // Optimistically toggle
-    const isAlreadyLiked = video?.likedBy?.includes(user._id);
+    const isAlreadyLiked = isLikedByUser(video?.likedBy, userId);
     let updatedLikedBy = video?.likedBy ? [...video.likedBy] : [];
     if (isAlreadyLiked) {
-      updatedLikedBy = updatedLikedBy.filter(uid => uid !== user._id);
+      updatedLikedBy = updatedLikedBy.filter(
+        (uid) => String(uid) !== String(userId)
+      );
     } else {
-      updatedLikedBy.push(user._id);
+      updatedLikedBy.push(userId);
     }
 
     const previousLikes = likes;
     const previousLikedBy = video?.likedBy || [];
 
     setLikes(updatedLikedBy.length);
-    setVideo(prev => ({
+    setVideo((prev) => ({
       ...prev,
-      likedBy: updatedLikedBy
+      likedBy: updatedLikedBy,
+      likes: updatedLikedBy.length
     }));
     setDisliked(false);
 
@@ -189,25 +201,26 @@ const VideoPlayer = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       });
-      if (!res.ok) {
-        throw new Error("Failed to sync like with server");
-      }
       const data = await res.json();
-      setLikes(data.likes || 0);
-      setVideo(prev => ({
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to sync like with server");
+      }
+      setLikes(data.likes ?? 0);
+      setVideo((prev) => ({
         ...prev,
+        likes: data.likes ?? 0,
         likedBy: data.likedBy || []
       }));
     } catch (error) {
       console.log(error);
-      // Revert UI on error
       setLikes(previousLikes);
-      setVideo(prev => ({
+      setVideo((prev) => ({
         ...prev,
-        likedBy: previousLikedBy
+        likedBy: previousLikedBy,
+        likes: previousLikes
       }));
     }
   };
@@ -465,6 +478,21 @@ const VideoPlayer = () => {
     day: "numeric"
   });
 
+  const userId = getUserId();
+  const userHasLiked = isLikedByUser(video?.likedBy, userId);
+  const currentIndex = recommended.findIndex((v) => v._id === video._id);
+  const prevVideo = currentIndex > 0 ? recommended[currentIndex - 1] : null;
+  const nextVideo =
+    currentIndex >= 0 && currentIndex < recommended.length - 1
+      ? recommended[currentIndex + 1]
+      : null;
+
+  const goToVideo = (targetId) => {
+    if (targetId) {
+      navigate(`/video/${targetId}`);
+    }
+  };
+
 
   return (
     <div className="vp-page">
@@ -519,7 +547,7 @@ const VideoPlayer = () => {
               <button
                 className="vp-split-pill-left"
                 onClick={likeVideo}
-                style={{ color: video?.likedBy?.includes(user?._id) ? "#3ea6ff" : "" }}
+                style={{ color: userHasLiked ? "#3ea6ff" : "" }}
               >
                 <svg viewBox="0 0 24 24">
                   <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
@@ -536,6 +564,22 @@ const VideoPlayer = () => {
                 </svg>
               </button>
             </div>
+
+            <button
+              className="vp-pill"
+              onClick={() => goToVideo(prevVideo?._id)}
+              disabled={!prevVideo}
+            >
+              <span>Previous</span>
+            </button>
+
+            <button
+              className="vp-pill"
+              onClick={() => goToVideo(nextVideo?._id)}
+              disabled={!nextVideo}
+            >
+              <span>Next</span>
+            </button>
 
             {/* Share Pill */}
             <button className="vp-pill" onClick={shareVideo}>
